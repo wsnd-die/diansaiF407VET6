@@ -53,7 +53,7 @@ vet6_mdk\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h
 vet6_mdk\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
 vet6_mdk\main.o: ../Core/Inc/REG.h
 vet6_mdk\main.o: ../Core/Inc/oled.h
-vet6_mdk\main.o: ../Core/Inc/bujin.h
+vet6_mdk\main.o: ../Core/Inc/bujin_can.h
 vet6_mdk\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h
 vet6_mdk\main.o: ../Core/Inc/odometer.h
 vet6_mdk\main.o: ../Core/Inc/tof200f.h

@@ -42,6 +42,13 @@ void MX_CAN1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
+HAL_StatusTypeDef CAN_FilterConfig_AcceptAll(void);
+HAL_StatusTypeDef CAN_Start(void);
+HAL_StatusTypeDef CAN_SendMessage(uint32_t id, uint8_t *data, uint8_t len);
+HAL_StatusTypeDef CAN_SendMessageExt(uint32_t id, uint8_t *data, uint8_t len);
+uint8_t CAN_GetReceivedMessage(uint32_t *id, uint8_t *data, uint8_t *len);
+void CAN_Test(void);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

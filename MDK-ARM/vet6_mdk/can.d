@@ -33,3 +33,6 @@ vet6_mdk\can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 vet6_mdk\can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 vet6_mdk\can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 vet6_mdk\can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+vet6_mdk\can.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
+vet6_mdk\can.o: ../Core/Inc/bujin_can.h
+vet6_mdk\can.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h

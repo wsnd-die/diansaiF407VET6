@@ -17,6 +17,7 @@
 "vet6_mdk\stm32f4xx_it.o"
 "vet6_mdk\stm32f4xx_hal_msp.o"
 "vet6_mdk\stm32f4xx_hal_timebase_tim.o"
+"vet6_mdk\bujin_can.o"
 "vet6_mdk\stm32f4xx_hal_tim.o"
 "vet6_mdk\stm32f4xx_hal_tim_ex.o"
 "vet6_mdk\stm32f4xx_hal_can.o"

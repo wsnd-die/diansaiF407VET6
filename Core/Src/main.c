@@ -32,7 +32,7 @@
 #include "can.h"
 #include "hwt101_hal.h"
 #include "oled.h"
-#include "bujin.h"
+#include "bujin_can.h"
 #include "odometer.h"
 #include "tof200f.h"
 #include "navigation.h"
@@ -115,7 +115,6 @@ int main(void)
   MX_TIM8_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-  USART6_Test();
   uint32_t hwt_wait_start;
   Servo_Init();
   HWT101_HAL_Init();

@@ -479,6 +479,11 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f4xx_hal_timebase_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>bujin_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\bujin_can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -655,5 +660,14 @@
     </components>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>vet6_mdk</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

@@ -25,7 +25,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "tim.h"
+#include "usart.h"
+#include "gpio.h"
+#include "can.h"
+#include "hwt101_hal.h"
+#include "oled.h"
+#include "bujin_can.h"
+#include "odometer.h"
+#include "tof200f.h"
+#include "navigation.h"
+#include "voice.h"
+#include "overroll.h"
+#include "servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -188,6 +200,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+  Emm_V5_Pos_Control(EMM_CAN_ID_ADDR, 0, 0, 0, 0, false, false);
   /* Infinite loop */
   for(;;)
   {
@@ -207,6 +220,7 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
+
   for(;;)
   {
     osDelay(1);

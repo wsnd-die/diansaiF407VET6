@@ -6,7 +6,7 @@
 extern UART_HandleTypeDef huart2;
 
 /* 里程计读取 5 号步进驱动器，和当前步进控制代码保持一致。 */
-#define ODOMETER_MOTOR_ADDR              5
+#define ODOMETER_MOTOR_ADDR              3
 
 /*
  * 轮子/卷轮半径，单位 cm。
