@@ -1,0 +1,15 @@
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/timers.c
+vet6_mdk\timers.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdlib.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+vet6_mdk\timers.o: D:\keil5\ARM\ARMCC\Bin\..\include\stddef.h
+vet6_mdk\timers.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+vet6_mdk\timers.o: ../Core/Inc/FreeRTOSConfig.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+vet6_mdk\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
