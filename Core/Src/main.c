@@ -113,7 +113,9 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM7_Init();
   MX_TIM8_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
+  USART6_Test();
   uint32_t hwt_wait_start;
   Servo_Init();
   HWT101_HAL_Init();
