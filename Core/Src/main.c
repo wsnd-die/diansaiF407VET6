@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "can.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -29,10 +28,9 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "can.h"
 #include "hwt101_hal.h"
 #include "oled.h"
-#include "bujin_can.h"
+#include "bujin.h"
 #include "odometer.h"
 #include "tof200f.h"
 #include "navigation.h"
@@ -109,12 +107,12 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
-  MX_CAN1_Init();
   MX_TIM3_Init();
   MX_TIM7_Init();
   MX_TIM8_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
+
   uint32_t hwt_wait_start;
   Servo_Init();
   HWT101_HAL_Init();

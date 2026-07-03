@@ -221,7 +221,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     PA0-WKUP     ------> UART4_TX
     PA1     ------> UART4_RX
     */
-    GPIO_InitStruct.Pin = wife_TX_Pin|wife_RX_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -283,7 +283,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     PB6     ------> USART1_TX
     PB7     ------> USART1_RX
     */
-    GPIO_InitStruct.Pin = GPS_TX_Pin|GPS_RX_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -310,7 +310,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     PA2     ------> USART2_TX
     PA3     ------> USART2_RX
     */
-    GPIO_InitStruct.Pin = ceju1_tx_Pin|ceju1_RX_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -337,7 +337,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     PC10     ------> USART3_TX
     PC11     ------> USART3_RX
     */
-    GPIO_InitStruct.Pin = ceju_2TX_Pin|ceju_2XR_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -392,7 +392,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PA0-WKUP     ------> UART4_TX
     PA1     ------> UART4_RX
     */
-    HAL_GPIO_DeInit(GPIOA, wife_TX_Pin|wife_RX_Pin);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_0|GPIO_PIN_1);
 
     /* UART4 interrupt Deinit */
     HAL_NVIC_DisableIRQ(UART4_IRQn);
@@ -434,7 +434,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PB6     ------> USART1_TX
     PB7     ------> USART1_RX
     */
-    HAL_GPIO_DeInit(GPIOB, GPS_TX_Pin|GPS_RX_Pin);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7);
 
     /* USART1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(USART1_IRQn);
@@ -454,7 +454,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PA2     ------> USART2_TX
     PA3     ------> USART2_RX
     */
-    HAL_GPIO_DeInit(GPIOA, ceju1_tx_Pin|ceju1_RX_Pin);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
 
     /* USART2 interrupt Deinit */
     HAL_NVIC_DisableIRQ(USART2_IRQn);
@@ -474,7 +474,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PC10     ------> USART3_TX
     PC11     ------> USART3_RX
     */
-    HAL_GPIO_DeInit(GPIOC, ceju_2TX_Pin|ceju_2XR_Pin);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10|GPIO_PIN_11);
 
     /* USART3 interrupt Deinit */
     HAL_NVIC_DisableIRQ(USART3_IRQn);

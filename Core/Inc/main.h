@@ -57,30 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define wife_TX_Pin GPIO_PIN_0
-#define wife_TX_GPIO_Port GPIOA
-#define wife_RX_Pin GPIO_PIN_1
-#define wife_RX_GPIO_Port GPIOA
-#define ceju1_tx_Pin GPIO_PIN_2
-#define ceju1_tx_GPIO_Port GPIOA
-#define ceju1_RX_Pin GPIO_PIN_3
-#define ceju1_RX_GPIO_Port GPIOA
-#define ceju_2TX_Pin GPIO_PIN_10
-#define ceju_2TX_GPIO_Port GPIOC
-#define ceju_2XR_Pin GPIO_PIN_11
-#define ceju_2XR_GPIO_Port GPIOC
 #define OLED_SCL_Pin GPIO_PIN_3
 #define OLED_SCL_GPIO_Port GPIOB
 #define OLED_SDA_Pin GPIO_PIN_4
 #define OLED_SDA_GPIO_Port GPIOB
-#define GPS_TX_Pin GPIO_PIN_6
-#define GPS_TX_GPIO_Port GPIOB
-#define GPS_RX_Pin GPIO_PIN_7
-#define GPS_RX_GPIO_Port GPIOB
-#define oled_scl_Pin GPIO_PIN_8
-#define oled_scl_GPIO_Port GPIOB
-#define oled_SDA_Pin GPIO_PIN_9
-#define oled_SDA_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

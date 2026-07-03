@@ -22,7 +22,6 @@ vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal
 vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h
 vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h
 vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h
-vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h
 vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h
 vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h
 vet6_mdk\stm32f4xx_hal_exti.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h

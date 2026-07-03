@@ -23,7 +23,6 @@ vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h
 vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h
 vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h
 vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h
-vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h
 vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h
 vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h
 vet6_mdk\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h
@@ -43,7 +42,6 @@ vet6_mdk\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers
 vet6_mdk\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
 vet6_mdk\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 vet6_mdk\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-vet6_mdk\main.o: ../Core/Inc/can.h
 vet6_mdk\main.o: ../Core/Inc/tim.h
 vet6_mdk\main.o: ../Core/Inc/usart.h
 vet6_mdk\main.o: ../Core/Inc/gpio.h
@@ -53,7 +51,7 @@ vet6_mdk\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h
 vet6_mdk\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
 vet6_mdk\main.o: ../Core/Inc/REG.h
 vet6_mdk\main.o: ../Core/Inc/oled.h
-vet6_mdk\main.o: ../Core/Inc/bujin_can.h
+vet6_mdk\main.o: ../Core/Inc/bujin.h
 vet6_mdk\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h
 vet6_mdk\main.o: ../Core/Inc/odometer.h
 vet6_mdk\main.o: ../Core/Inc/tof200f.h

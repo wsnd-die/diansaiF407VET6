@@ -28,10 +28,9 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "can.h"
 #include "hwt101_hal.h"
 #include "oled.h"
-#include "bujin_can.h"
+#include "bujin.h"
 #include "odometer.h"
 #include "tof200f.h"
 #include "navigation.h"
@@ -200,11 +199,13 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-  Emm_V5_Pos_Control(EMM_CAN_ID_ADDR, 0, 0, 0, 0, false, false);
+  Emm_V5_Pos_Control(3, 0, 200, 5, 100, false, false);
+
+  osDelay(1000);
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(100);
   }
   /* USER CODE END StartDefaultTask */
 }
