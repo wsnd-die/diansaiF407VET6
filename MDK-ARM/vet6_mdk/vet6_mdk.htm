@@ -3,11 +3,11 @@
 <title>Static Call Graph - [vet6_mdk\vet6_mdk.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image vet6_mdk\vet6_mdk.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Fri Jul 03 20:30:17 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Fri Jul 03 22:40:53 2026
 <BR><P>
 <H3>Maximum Stack Usage =        264 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-StartDefaultTask &rArr; Emm_V5_Pos_Control &rArr; Emm_V5_Pos_Control_ByPulse &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+StartTask02 &rArr; Emm_V5_Pos_Control &rArr; Emm_V5_Pos_Control_ByPulse &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 <P>
 <H3>
 Functions with no stack information
@@ -23,8 +23,8 @@ Mutually Recursive functions
  <LI><a href="#[5]">HardFault_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[5]">HardFault_Handler</a><BR>
  <LI><a href="#[6]">MemManage_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[6]">MemManage_Handler</a><BR>
  <LI><a href="#[4]">NMI_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">NMI_Handler</a><BR>
+ <LI><a href="#[64]">StartDefaultTask</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[64]">StartDefaultTask</a><BR>
  <LI><a href="#[be]">UART_EndRxTransfer</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[be]">UART_EndRxTransfer</a><BR>
- <LI><a href="#[65]">StartTask02</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[65]">StartTask02</a><BR>
  <LI><a href="#[66]">StartTask03</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[66]">StartTask03</a><BR>
  <LI><a href="#[67]">StartTask04</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[67]">StartTask04</a><BR>
  <LI><a href="#[68]">StartTask05</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[68]">StartTask05</a><BR>
@@ -689,7 +689,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control_ByPulse
 </UL>
-<BR>[Called By]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartDefaultTask
+<BR>[Called By]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartTask02
 </UL>
 
 <P><STRONG><a name="[d4]"></a>Error_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, main.o(i.Error_Handler))
@@ -1081,7 +1081,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[d1]"></a>MX_GPIO_Init</STRONG> (Thumb, 162 bytes, Stack size 40 bytes, gpio.o(i.MX_GPIO_Init))
+<P><STRONG><a name="[d1]"></a>MX_GPIO_Init</STRONG> (Thumb, 134 bytes, Stack size 40 bytes, gpio.o(i.MX_GPIO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = MX_GPIO_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_Init
@@ -1335,22 +1335,22 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_Init
 </UL>
 
-<P><STRONG><a name="[64]"></a>StartDefaultTask</STRONG> (Thumb, 36 bytes, Stack size 16 bytes, freertos.o(i.StartDefaultTask))
-<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = StartDefaultTask &rArr; Emm_V5_Pos_Control &rArr; Emm_V5_Pos_Control_ByPulse &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<P><STRONG><a name="[64]"></a>StartDefaultTask</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, freertos.o(i.StartDefaultTask))
+<BR><BR>[Stack]<UL><LI>Max Depth = 72 + In Cycle
+<LI>Call Chain = StartDefaultTask &rArr;  StartDefaultTask (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control
-<LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<BR>[Calls]<UL><LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartDefaultTask
+</UL>
+<BR>[Called By]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartDefaultTask
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(i.MX_FREERTOS_Init)
 </UL>
-<P><STRONG><a name="[65]"></a>StartTask02</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, freertos.o(i.StartTask02))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72 + In Cycle
-<LI>Call Chain = StartTask02 &rArr;  StartTask02 (Cycle)
+<P><STRONG><a name="[65]"></a>StartTask02</STRONG> (Thumb, 36 bytes, Stack size 16 bytes, freertos.o(i.StartTask02))
+<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = StartTask02 &rArr; Emm_V5_Pos_Control &rArr; Emm_V5_Pos_Control_ByPulse &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
-<BR>[Calls]<UL><LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartTask02
-</UL>
-<BR>[Called By]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartTask02
+<BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control
+<LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(i.MX_FREERTOS_Init)
 </UL>

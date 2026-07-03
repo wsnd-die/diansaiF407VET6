@@ -199,9 +199,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-  Emm_V5_Pos_Control(3, 0, 200, 5, 100, false, false);
 
-  osDelay(1000);
   /* Infinite loop */
   for(;;)
   {
@@ -221,7 +219,9 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
+  Emm_V5_Pos_Control(3, 0, 200, 5, 100, false, false);
 
+  osDelay(1000);
   for(;;)
   {
     osDelay(1);
