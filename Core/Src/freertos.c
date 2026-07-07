@@ -69,43 +69,43 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t myTask02Handle;
 const osThreadAttr_t myTask02_attributes = {
   .name = "myTask02",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal4,
 };
 /* Definitions for myTask03 */
 osThreadId_t myTask03Handle;
 const osThreadAttr_t myTask03_attributes = {
   .name = "myTask03",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal5,
 };
 /* Definitions for myTask04 */
 osThreadId_t myTask04Handle;
 const osThreadAttr_t myTask04_attributes = {
   .name = "myTask04",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal6,
 };
 /* Definitions for myTask05 */
 osThreadId_t myTask05Handle;
 const osThreadAttr_t myTask05_attributes = {
   .name = "myTask05",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal7,
 };
 /* Definitions for myTask06 */
 osThreadId_t myTask06Handle;
 const osThreadAttr_t myTask06_attributes = {
   .name = "myTask06",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for myTask07 */
 osThreadId_t myTask07Handle;
 const osThreadAttr_t myTask07_attributes = {
   .name = "myTask07",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for usart2TX */
 osMutexId_t usart2TXHandle;
@@ -219,12 +219,16 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
-  Emm_V5_Pos_Control(3, 0, 200, 5, 100, false, false);
-
-  osDelay(1000);
+    Emm_V5_Pos_Control(1, 0, 0, 200, 1000, 0, 1);
+    Emm_V5_Pos_Control(2, 0, 100, 100, 1000, 0, 1);
+  Emm_V5_Pos_Control(3, 0, 100, 100, 1000, 0, 1);
+    Emm_V5_Pos_Control(4, 0, 100, 100, 1000, 0, 1);
+    Emm_V5_Synchronous_motion(0);
+    osDelay(1000);
   for(;;)
   {
-    osDelay(1);
+ osDelay(100);
+ 
   }
   /* USER CODE END StartTask02 */
 }
@@ -242,7 +246,8 @@ void StartTask03(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+     Odometer_Update();//���͸������ȡ���ݣ�Ȼ���ڴ���??2�����жϸ�������
+    osDelay(20);
   }
   /* USER CODE END StartTask03 */
 }

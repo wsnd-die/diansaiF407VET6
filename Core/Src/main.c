@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -37,6 +38,7 @@
 #include "voice.h"
 #include "overroll.h"
 #include "servo.h"
+#include "bluetooth.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,11 +113,13 @@ int main(void)
   MX_TIM7_Init();
   MX_TIM8_Init();
   MX_USART6_UART_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
   uint32_t hwt_wait_start;
-  Servo_Init();
+  // Servo_Init();
   HWT101_HAL_Init();
+  Bluetooth_Init();
   g_hwt101_data_ready = 0;
   hwt_wait_start = HAL_GetTick();
   while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
@@ -123,10 +127,10 @@ int main(void)
   }
   Navigation_Reset(NAV_START_CENTER_X_CM, NAV_START_CENTER_Y_CM, HWT101_GetYaw());
   Odometer_Init();
-  TOF200F_Init();
+  // TOF200F_Init();
   OLED_Init();
-  OLED_ShowString(0, 0, "Yaw:", 16);
-  OLED_ShowString(0, 2, "Dis:", 16);
+  // OLED_ShowString(0, 0, "Yaw:", 16);
+  // OLED_ShowString(0, 2, "Dis:", 16);
   OLED_ShowString(0, 4, "X:", 16);
   OLED_ShowString(0, 6, "Y:", 16);
 

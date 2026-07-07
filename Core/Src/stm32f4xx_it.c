@@ -25,6 +25,7 @@
 #include "hwt101_hal.h"
 #include "odometer.h"
 #include "tof200f.h"
+#include "bluetooth.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,6 +64,7 @@ extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart6;
 extern TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN EV */
@@ -310,6 +312,31 @@ void TIM6_DAC_IRQHandler(void)
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
   /* USER CODE END TIM6_DAC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART6 global interrupt.
+  */
+void USART6_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART6_IRQn 0 */
+  if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_ORE) != RESET)
+  {
+    __HAL_UART_CLEAR_OREFLAG(&huart6);
+  }
+
+  if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_RXNE) != RESET)
+  {
+    uint8_t data = (uint8_t)(huart6.Instance->DR & 0xFF);
+    Bluetooth_UartRxByte(data);
+    return;
+  }
+
+  /* USER CODE END USART6_IRQn 0 */
+  HAL_UART_IRQHandler(&huart6);
+  /* USER CODE BEGIN USART6_IRQn 1 */
+
+  /* USER CODE END USART6_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

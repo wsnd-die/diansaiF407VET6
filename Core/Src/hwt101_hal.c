@@ -115,6 +115,7 @@ float HWT101_GetPitch(void)
 float HWT101_GetYaw(void)
 {
     return g_hwt101_yaw;
+ 
 }
 
 int16_t HWT101_ReadReg(uint32_t reg)
