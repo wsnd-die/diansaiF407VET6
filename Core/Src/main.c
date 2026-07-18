@@ -38,7 +38,6 @@
 #include "voice.h"
 #include "overroll.h"
 #include "servo.h"
-#include "bluetooth.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,7 +118,6 @@ int main(void)
   uint32_t hwt_wait_start;
   // Servo_Init();
   HWT101_HAL_Init();
-  Bluetooth_Init();
   g_hwt101_data_ready = 0;
   hwt_wait_start = HAL_GetTick();
   while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
@@ -133,7 +131,7 @@ int main(void)
   // OLED_ShowString(0, 2, "Dis:", 16);
   OLED_ShowString(0, 4, "X:", 16);
   OLED_ShowString(0, 6, "Y:", 16);
-
+  Voice_Num(17);
   /* USER CODE END 2 */
 
   /* Init scheduler */
