@@ -37,7 +37,7 @@
 #include "navigation.h"
 #include "voice.h"
 #include "overroll.h"
-#include "servo.h"
+#include "pca9685.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,6 +115,11 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
+  if (PCA9685_Init() != 0)
+  {
+    Error_Handler();
+  }
+
   uint32_t hwt_wait_start;
   // Servo_Init();
   HWT101_HAL_Init();
@@ -131,7 +136,7 @@ int main(void)
   // OLED_ShowString(0, 2, "Dis:", 16);
   OLED_ShowString(0, 4, "X:", 16);
   OLED_ShowString(0, 6, "Y:", 16);
-  Voice_Num(17);
+//  Voice_Num(17);
   /* USER CODE END 2 */
 
   /* Init scheduler */

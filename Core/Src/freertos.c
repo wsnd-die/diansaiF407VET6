@@ -36,7 +36,7 @@
 #include "navigation.h"
 #include "voice.h"
 #include "overroll.h"
-#include "servo.h"
+#include "pca9685.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -219,12 +219,8 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
-    Emm_V5_Pos_Control(1, 0, 0, 200, 1000, 0, 1);
-    Emm_V5_Pos_Control(2, 0, 100, 100, 1000, 0, 1);
-  Emm_V5_Pos_Control(3, 0, 100, 100, 1000, 0, 1);
-    Emm_V5_Pos_Control(4, 0, 100, 100, 1000, 0, 1);
-    Emm_V5_Synchronous_motion(0);
-    osDelay(1000);
+PCA9685_Set270Angle(0.0f);
+    osDelay(100);
   for(;;)
   {
  osDelay(100);
@@ -246,7 +242,7 @@ void StartTask03(void *argument)
   /* Infinite loop */
   for(;;)
   {
-     Odometer_Update();//���͸������ȡ���ݣ�Ȼ���ڴ���??2�����жϸ�������
+     Odometer_Update();
     osDelay(20);
   }
   /* USER CODE END StartTask03 */

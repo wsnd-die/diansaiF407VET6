@@ -425,11 +425,6 @@
               <FilePath>../Core/Src/oled.c</FilePath>
             </File>
             <File>
-              <FileName>servo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/servo.c</FilePath>
-            </File>
-            <File>
               <FileName>tof200f.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/tof200f.c</FilePath>
@@ -534,6 +529,11 @@
               <FileName>voice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\voice.c</FilePath>
+            </File>
+            <File>
+              <FileName>pca9685.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/pca9685.c</FilePath>
             </File>
           </Files>
         </Group>

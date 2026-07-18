@@ -60,4 +60,4 @@ vet6_mdk\freertos.o: ../Core/Inc/tof200f.h
 vet6_mdk\freertos.o: ../Core/Inc/navigation.h
 vet6_mdk\freertos.o: ../Core/Inc/voice.h
 vet6_mdk\freertos.o: ../Core/Inc/overroll.h
-vet6_mdk\freertos.o: ../Core/Inc/servo.h
+vet6_mdk\freertos.o: ../Core/Inc/pca9685.h
