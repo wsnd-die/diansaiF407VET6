@@ -432,6 +432,11 @@
               <FilePath>../Core/Src/tof200f.c</FilePath>
             </File>
             <File>
+              <FileName>bluetooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/bluetooth.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -493,11 +498,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>bluetooth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/bluetooth.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>

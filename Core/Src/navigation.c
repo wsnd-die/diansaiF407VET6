@@ -28,8 +28,8 @@ struct move angle_speed = {0, 0, 0};
 float v[2] = {0}; //0为左轮，1为右轮
                   //地址1,4为左轮，2,3为右轮
 
-int TarAngle=0;//目标角度
-float TarPos = 360.0;//目标位置
+int TarAngle=0;//目标角度，单位度，供旋转 PID 使用
+float TarPos = 360.0;//目标位置，当前文件未直接使用，保留给上层运动逻辑
 
 bool is_moving = 0;
 /* 圆周率，用于把角度制 yaw 转成弧度制，供 sinf/cosf 使用。 */
@@ -136,15 +136,27 @@ float Navigation_GetYawDeg(void)
 {
     return g_nav_yaw_deg;
 }
+
+/**
+  * @brief  根据目标角度和当前 yaw 计算旋转角速度
+  * @note   输入使用全局 TarAngle 和 g_nav_yaw_deg，输出写入 angle_speed.real。
+  *         angle_speed.real 后续会作为差速模型的旋转量使用。
+  */
 void Rotate_Updata(void)
 {
 	float Angle_Difference;  //定义角度误差
+
+	/* 先把目标角度压到 -180~180，避免 359 度和 -1 度这类等价角度产生大误差。 */
 	if(TarAngle>180){
 		TarAngle -= 360;
 	}else if(TarAngle < -180){
 		TarAngle += 360;
 	}
+
+	/* 当前误差 = 目标角度 - 当前角度 + 机械/安装修正量。 */
 	Angle_Difference = TarAngle - g_nav_yaw_deg + angle_fix;
+
+	/* 误差同样归一化到 -180~180，保证车辆走最短旋转方向。 */
 	if(Angle_Difference>180){
 		Angle_Difference -=360;
 	}else if(Angle_Difference<-180){
@@ -160,13 +172,15 @@ void Rotate_Updata(void)
 		//累积误差
 		AngleError0=AngleError1;
 		AngleError1=Angle_Difference;
-		//积分分离
+
+		//积分分离：只有小角度误差时才累计积分，降低大角度旋转时的积分过冲
 		if(fabs(AngleError1)<3)
 			AngleErrorInt += AngleError1;
+
 		//PID计算
 		AngleResult = -(kp_A2 * AngleError1 + ki_A2 * AngleErrorInt + kd_A2 * (AngleError1 - AngleError0));
 		
-		//变化死区限制
+		//输出限幅，避免旋转速度过大
 		if (AngleResult > 30) 
 		AngleResult = 30;
 		if (AngleResult < -30) 
@@ -175,10 +189,20 @@ void Rotate_Updata(void)
 		angle_speed.real = AngleResult;
 	}
 }
+
+/**
+  * @brief  差速四轮速度分配并下发到 4 个步进电机
+  * @param  Velocity  车体前进速度分量，正负决定前进/后退
+  * @param  Palstance 车体旋转速度分量，函数内部取反以匹配当前底盘方向约定
+  * @note   v[0] 为左侧轮组速度，v[1] 为右侧轮组速度。
+  *         left_head/left_tail/right_head/right_tail 的地址定义在 bujin.h。
+  */
 void DiffX4_Wheel_Speed_Model_Config(float Velocity, float Palstance)
 { 
+	/* 根据现有安装方向修正旋转项符号。 */
 	Palstance = -Palstance;
 
+	/* 差速模型：左右轮速度 = 直行速度 +/- 旋转速度 * 半车宽。 */
 	v[0] = Velocity+Palstance*half_wide_size;
 	v[1] = -(Velocity-Palstance*half_wide_size);
 
