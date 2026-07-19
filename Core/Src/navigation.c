@@ -33,7 +33,7 @@ Navigation_State_t navigation_state = NAVIGATION_STATE_IDLE;
 volatile position_t g_robot_pos = {0.0f, 0.0f, 0.0f};           /* 机器人在世界坐标系下的绝对位姿 */
 struct move speed = {0.0f, 0.0f, 0.0f};                         /* 保留以防其他文件 extern */
 struct move angle_speed = {0.0f, 0.0f, 0.0f};
-float nav_yaw_zero_deg;
+float nav_yaw_zero_deg=0.0f;
 int TarAngle;
 float TarPos = 360.0f;
 bool is_moving;

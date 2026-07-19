@@ -90,6 +90,11 @@ void App_CommandUartRxByte(uint8_t data)
         s_stop_requested = true;
         App_SetMode(APP_MODE_IDLE);
     }
+    else if (data == 's' || data == 'S') {
+        s_app_running = 1;
+        s_stop_requested = 0;
+        App_SetMode(APP_MODE_TEST);
+    }
 }
 static long PC_Comm_FloatToCenti(float value)
 {
@@ -101,50 +106,48 @@ static long PC_Comm_FloatToCenti(float value)
 }
 
 
-void PC_Comm_SendNavigationStatus(void)
-{
-    char tx_buf[96];
-    int len;
-    long yaw = PC_Comm_FloatToCenti(Navigation_GetYawDeg());
-    long x = PC_Comm_FloatToCenti(g_robot_pos.x);
-    long y = PC_Comm_FloatToCenti(g_robot_pos.y);
-    long yaw_abs = (yaw < 0) ? -yaw : yaw;
-    long x_abs = (x < 0) ? -x : x;
-    long y_abs = (y < 0) ? -y : y;
-
-    len = snprintf(tx_buf, sizeof(tx_buf),
-                   "yaw=%s%ld.%02ld,x=%s%ld.%02ld,y=%s%ld.%02ld,state=%u,test=%u\r\n",
-                   (yaw < 0) ? "-" : "", yaw_abs / 100L, yaw_abs % 100L,
-                   (x < 0) ? "-" : "", x_abs / 100L, x_abs % 100L,
-                   (y < 0) ? "-" : "", y_abs / 100L, y_abs % 100L,
-                   (unsigned int)navigation_state,
-                   (unsigned int)s_app_running);
-
-    if (len > 0) {
-        if (len >= (int)sizeof(tx_buf)) {
-            len = (int)sizeof(tx_buf) - 1;
-        }
-        (void)HAL_UART_Transmit(&huart6, (uint8_t *)tx_buf, (uint16_t)len, 50);
-    }
-}
 /**
  * @brief 应用主循环/任务中调用的模式执行函数
  *        根据当前所处的 g_app_mode 决定执行哪条航线，或处理停止请求
  */
 void App_RunCurrentMode(void)
 {
-    if (s_stop_requested) {
-        s_stop_requested = false;
-        Navigation_Stop();
-        return;
-    }
+        if (s_stop_requested) {
+            s_stop_requested = false;
+            Navigation_Stop();
+            return;
+        }
 
-    if (g_app_mode == APP_MODE_ROUTE_A) {
-        /* 执行航线 A，执行完毕后自动进入模式 C */
-        App_RunRoute(k_route_a, APP_ROUTE_LEN(k_route_a), APP_MODE_ROUTE_C);
-    } else if (g_app_mode == APP_MODE_ROUTE_C) {
-        /* 执行航线 C，执行完毕后回到空闲状态 */
-        App_RunRoute(k_route_c, APP_ROUTE_LEN(k_route_c), APP_MODE_IDLE);
+  
+     switch (g_app_mode) {
+        case APP_MODE_TEST:
+            /* Test mode: currently does nothing, but can be used for debugging or custom tests. */
+            break;
+
+        case APP_MODE_IDLE:
+            /* Idle mode: ensure the robot is stopped and not executing any navigation tasks. */
+           
+            break;
+
+        case APP_MODE_ROUTE_A:
+            App_RunRoute(k_route_a, APP_ROUTE_LEN(k_route_a), APP_MODE_ROUTE_C);
+            break;
+
+        case APP_MODE_ROUTE_B:
+            /* Route B is intentionally retained as a no-op placeholder. */
+            break;
+
+        case APP_MODE_ROUTE_C:
+            /*
+             * Preserve the current behavior: route C leaves the app in route C
+             * after completion, so the scheduler can enter it again.
+             */
+            App_RunRoute(k_route_c, APP_ROUTE_LEN(k_route_c), APP_MODE_ROUTE_C);
+            break;
+
+        default:
+            App_SetMode(APP_MODE_IDLE);
+            break;
     }
 }
 

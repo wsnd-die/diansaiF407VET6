@@ -37,7 +37,7 @@
 #include "voice.h"
 #include "overroll.h"
 #include "pca9685.h"
-#include "pc_comm.h"
+#include "app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -220,9 +220,25 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
-    osDelay(100);
+    
   for(;;)
-  {
+  { char uart_buf[64];
+
+    OLED_ShowString(40, 0, "        ", 16);
+    OLED_ShowFloat(40, 0, g_robot_pos.yaw, 6, 16);
+    OLED_ShowString(40, 2, "        ", 16);
+    OLED_ShowFloat(40, 2, TofData / 10.0f, 6, 16);
+    OLED_ShowString(24, 4, "        ", 16);
+    OLED_ShowFloat(24, 4, g_robot_pos.x, 6, 16);
+    OLED_ShowString(24, 6, "        ", 16);
+    OLED_ShowFloat(24, 6, g_robot_pos.y, 6, 16);
+
+    /* UART1 输出位置信息 */
+    int len = snprintf(uart_buf, sizeof(uart_buf),
+                       "X:%.2f Y:%.2f Yaw:%.2f S:%d\r\n",
+                       g_robot_pos.x/10, g_robot_pos.y/10, g_robot_pos.yaw,
+                       navigation_state);
+    HAL_UART_Transmit(&huart6, (uint8_t *)uart_buf, len, 100);
  osDelay(100);
  
   }
@@ -242,8 +258,10 @@ void StartTask03(void *argument)
   /* Infinite loop */
   for(;;)
   {
+     g_robot_pos.yaw = Get_zeroYaw();
+     Navigation_TaskTick();
      Odometer_Update();
-    osDelay(20);
+     vTaskDelay(pdMS_TO_TICKS(10));
   }
   /* USER CODE END StartTask03 */
 }
@@ -259,8 +277,11 @@ void StartTask04(void *argument)
 {
   /* USER CODE BEGIN StartTask04 */
   /* Infinite loop */
+  App_Init();
   for(;;)
   {
+        /* App chain: read current app mode and execute one scheduling step. */
+        App_RunCurrentMode();
     osDelay(1);
   }
   /* USER CODE END StartTask04 */
@@ -297,7 +318,6 @@ void StartTask06(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    PC_Comm_SendNavigationStatus();
     osDelay(100);
   }
   /* USER CODE END StartTask06 */

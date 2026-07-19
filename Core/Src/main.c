@@ -38,6 +38,7 @@
 #include "voice.h"
 #include "overroll.h"
 #include "pca9685.h"
+#include "app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,28 +116,21 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  if (PCA9685_Init() != 0)
+  if (PCA9685_Init() != 0)//舵机初始化
   {
     Error_Handler();
   }
-
   uint32_t hwt_wait_start;
-  // Servo_Init();
   HWT101_HAL_Init();
   g_hwt101_data_ready = 0;
   hwt_wait_start = HAL_GetTick();
   while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
   {
   }
-  Navigation_Reset(NAV_START_CENTER_X_MM, NAV_START_CENTER_Y_MM, HWT101_GetYaw());
+  Navigation_Reset(NAV_START_CENTER_X_MM, NAV_START_CENTER_Y_MM, g_hwt101_yaw);
   Odometer_Init();
   // TOF200F_Init();
   OLED_Init();
-  // OLED_ShowString(0, 0, "Yaw:", 16);
-  // OLED_ShowString(0, 2, "Dis:", 16);
-  OLED_ShowString(0, 4, "X:", 16);
-  OLED_ShowString(0, 6, "Y:", 16);
-//  Voice_Num(17);
   /* USER CODE END 2 */
 
   /* Init scheduler */

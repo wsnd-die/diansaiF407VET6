@@ -18,6 +18,7 @@
 "vet6_mdk\stm32f4xx_hal_timebase_tim.o"
 "vet6_mdk\voice.o"
 "vet6_mdk\pca9685.o"
+"vet6_mdk\app.o"
 "vet6_mdk\stm32f4xx_hal_tim.o"
 "vet6_mdk\stm32f4xx_hal_tim_ex.o"
 "vet6_mdk\stm32f4xx_hal_rcc.o"

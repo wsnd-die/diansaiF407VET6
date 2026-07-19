@@ -17,7 +17,7 @@ extern UART_HandleTypeDef huart2;
 #define ODOMETER_POS_CMD                 0x36U          /**< 查询当前角度的命令字 */
 #define ODOMETER_FRAME_END               0x6BU          /**< 回帧校验结束字 */
 #define ODOMETER_ANGLE_SCALE             (360.0f / 65536.0f) /**< 65536 个数值代表一圈（360度） */
-#define ODOMETER_POLL_INTERVAL_MS        50U            /**< 轮询位置的周期：50 ms */
+
 
 /**
  * @brief 单轮里程计状态结构体
@@ -167,7 +167,7 @@ void Odometer_Update(void)
     uint32_t now = HAL_GetTick();
 
     /* 限制最小轮询采样间隔时间 */
-    if ((uint32_t)(now - last_poll_time) < ODOMETER_POLL_INTERVAL_MS) {
+    if ((uint32_t)(now - last_poll_time) < 50U) {
         return;
     }
     last_poll_time = now;

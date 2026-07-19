@@ -1,5 +1,5 @@
 #include "hwt101_hal.h"
-
+#include "navigation.h"
 /* 引用 main.c 中的 UART4 句柄 */
 extern UART_HandleTypeDef huart4;
 
@@ -101,21 +101,10 @@ int32_t HWT101_HAL_Init(void)
     return WIT_HAL_OK;
 }
 
-/* ---- 便捷访问函数（归一化缩放，±180°） ---- */
-float HWT101_GetRoll(void)
-{
-    return g_hwt101_roll;
-}
 
-float HWT101_GetPitch(void)
+float Get_zeroYaw(void)
 {
-    return g_hwt101_pitch;
-}
-
-float HWT101_GetYaw(void)
-{
-    return g_hwt101_yaw;
- 
+    return Navigation_NormalizeDeg(g_hwt101_yaw - nav_yaw_zero_deg);
 }
 
 int16_t HWT101_ReadReg(uint32_t reg)

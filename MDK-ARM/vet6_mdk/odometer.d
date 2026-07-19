@@ -36,9 +36,4 @@ vet6_mdk\odometer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 vet6_mdk\odometer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 vet6_mdk\odometer.o: ../Core/Inc/bujin.h
 vet6_mdk\odometer.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h
-vet6_mdk\odometer.o: ../Core/Inc/hwt101_hal.h
-vet6_mdk\odometer.o: ../Core/Inc/hwt101.h
-vet6_mdk\odometer.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h
-vet6_mdk\odometer.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
-vet6_mdk\odometer.o: ../Core/Inc/REG.h
 vet6_mdk\odometer.o: ../Core/Inc/navigation.h

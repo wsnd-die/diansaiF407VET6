@@ -511,11 +511,6 @@
               <FilePath>../Core/Src/usart.c</FilePath>
             </File>
             <File>
-              <FileName>pc_comm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/pc_comm.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f4xx_it.c</FilePath>
@@ -539,6 +534,11 @@
               <FileName>pca9685.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/pca9685.c</FilePath>
+            </File>
+            <File>
+              <FileName>app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\app.c</FilePath>
             </File>
           </Files>
         </Group>

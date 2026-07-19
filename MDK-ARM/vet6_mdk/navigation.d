@@ -36,4 +36,13 @@ vet6_mdk\navigation.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.
 vet6_mdk\navigation.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 vet6_mdk\navigation.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h
 vet6_mdk\navigation.o: ../Core/Inc/bujin.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+vet6_mdk\navigation.o: ../Core/Inc/FreeRTOSConfig.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+vet6_mdk\navigation.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 vet6_mdk\navigation.o: D:\keil5\ARM\ARMCC\Bin\..\include\math.h

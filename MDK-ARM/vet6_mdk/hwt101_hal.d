@@ -37,3 +37,6 @@ vet6_mdk\hwt101_hal.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.
 vet6_mdk\hwt101_hal.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 vet6_mdk\hwt101_hal.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 vet6_mdk\hwt101_hal.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+vet6_mdk\hwt101_hal.o: ../Core/Inc/navigation.h
+vet6_mdk\hwt101_hal.o: ../Core/Inc/main.h
+vet6_mdk\hwt101_hal.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h

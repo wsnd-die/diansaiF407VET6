@@ -41,3 +41,5 @@ vet6_mdk\stm32f4xx_it.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
 vet6_mdk\stm32f4xx_it.o: ../Core/Inc/REG.h
 vet6_mdk\stm32f4xx_it.o: ../Core/Inc/odometer.h
 vet6_mdk\stm32f4xx_it.o: ../Core/Inc/tof200f.h
+vet6_mdk\stm32f4xx_it.o: ../Core/Inc/app.h
+vet6_mdk\stm32f4xx_it.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdbool.h
