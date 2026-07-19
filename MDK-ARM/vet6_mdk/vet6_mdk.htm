@@ -3,7 +3,7 @@
 <title>Static Call Graph - [vet6_mdk\vet6_mdk.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image vet6_mdk\vet6_mdk.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Sun Jul 19 11:56:29 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Sun Jul 19 12:06:34 2026
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1677,7 +1677,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(i.MX_FREERTOS_Init)
 </UL>
-<P><STRONG><a name="[69]"></a>StartTask03</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, freertos.o(i.StartTask03))
+<P><STRONG><a name="[69]"></a>StartTask03</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, freertos.o(i.StartTask03))
 <BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = StartTask03 &rArr; Navigation_TaskTick &rArr; Navigation_HandleTargetAlign &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[119]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_TaskTick

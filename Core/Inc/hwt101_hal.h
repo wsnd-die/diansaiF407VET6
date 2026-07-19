@@ -30,20 +30,11 @@ int32_t HWT101_HAL_Init(void);
  */
 void HWT101_ParsePacket(uint8_t *data);
 
-/**
- * @brief  便捷：读取 Roll 角（度，±180°）
- */
-float HWT101_GetRoll(void);
 
 /**
- * @brief  便捷：读取 Pitch 角（度，±180°）
+ * @brief  读取相对初始化零点的 Yaw 角（度，-180°~180°）
  */
-float HWT101_GetPitch(void);
-
-/**
- * @brief  便捷：读取 Yaw 角（度，±180°）
- */
-float HWT101_GetYaw(void);
+float Get_zeroYaw(void);
 
 /**
  * @brief  读取指定寄存器的原始 int16 值

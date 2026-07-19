@@ -55,7 +55,7 @@ I (D:\keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (D:\keil5\ARM\ARMCC\include\string.h)(0x588B8344)
 I (../Core/Inc/REG.h)(0x6A43699A)
 F (../Core/Src/hwt101_hal.c)(0x6A5C48C8)(--c99 -c --cpu Cortex-M4.fp.sp -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_vet6_mdk-ID:\keil5\ARM\PACK\ARM\CMSIS\6.2.0\CMSIS\Core\Include-D__UVISION_VERSION="543" -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx-o vet6_mdk\hwt101_hal.o --omf_browse vet6_mdk\hwt101_hal.crf --depend vet6_mdk\hwt101_hal.d)
-I (../Core/Inc/hwt101_hal.h)(0x6A470FDD)
+I (../Core/Inc/hwt101_hal.h)(0x6A5C4D43)
 I (../Core/Inc/hwt101.h)(0x6A4369A7)
 I (D:\keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
 I (D:\keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
@@ -300,7 +300,7 @@ I (../Core/Inc/i2c.h)(0x6A4CAECE)
 I (../Core/Inc/tim.h)(0x6A4707C7)
 I (../Core/Inc/usart.h)(0x6A5C3EBD)
 I (../Core/Inc/gpio.h)(0x6A4707C4)
-I (../Core/Inc/hwt101_hal.h)(0x6A470FDD)
+I (../Core/Inc/hwt101_hal.h)(0x6A5C4D43)
 I (../Core/Inc/hwt101.h)(0x6A4369A7)
 I (D:\keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (D:\keil5\ARM\ARMCC\include\string.h)(0x588B8344)
@@ -398,7 +398,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h)(0x6A470
 I (../Core/Inc/tim.h)(0x6A4707C7)
 I (../Core/Inc/usart.h)(0x6A5C3EBD)
 I (../Core/Inc/gpio.h)(0x6A4707C4)
-I (../Core/Inc/hwt101_hal.h)(0x6A470FDD)
+I (../Core/Inc/hwt101_hal.h)(0x6A5C4D43)
 I (../Core/Inc/hwt101.h)(0x6A4369A7)
 I (D:\keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (D:\keil5\ARM\ARMCC\include\string.h)(0x588B8344)
@@ -553,7 +553,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x6A4707BB)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x6A4707BB)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x6A4707BB)
 I (../Core/Inc/stm32f4xx_it.h)(0x6A4CAECF)
-I (../Core/Inc/hwt101_hal.h)(0x6A470FDD)
+I (../Core/Inc/hwt101_hal.h)(0x6A5C4D43)
 I (../Core/Inc/hwt101.h)(0x6A4369A7)
 I (D:\keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (D:\keil5\ARM\ARMCC\include\string.h)(0x588B8344)
