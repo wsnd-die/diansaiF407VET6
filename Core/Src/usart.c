@@ -199,6 +199,7 @@ void MX_USART6_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART6_Init 2 */
+  __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
 
   /* USER CODE END USART6_Init 2 */
 
@@ -512,11 +513,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 void USART6_Test(void)
 {
     uint8_t test_msg[] = "USART6 Test OK!\r\n";
-    uint8_t rx_byte;
 
     HAL_UART_Transmit(&huart6, test_msg, sizeof(test_msg) - 1, 1000);
-
-
 }
 
 /* USER CODE END 1 */

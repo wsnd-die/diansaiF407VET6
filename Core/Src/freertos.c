@@ -37,6 +37,7 @@
 #include "voice.h"
 #include "overroll.h"
 #include "pca9685.h"
+#include "pc_comm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -219,7 +220,6 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
-PCA9685_Set270Angle(0.0f);
     osDelay(100);
   for(;;)
   {
@@ -297,7 +297,8 @@ void StartTask06(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    PC_Comm_SendNavigationStatus();
+    osDelay(100);
   }
   /* USER CODE END StartTask06 */
 }

@@ -128,7 +128,7 @@ int main(void)
   while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
   {
   }
-  Navigation_Reset(NAV_START_CENTER_X_CM, NAV_START_CENTER_Y_CM, HWT101_GetYaw());
+  Navigation_Reset(NAV_START_CENTER_X_MM, NAV_START_CENTER_Y_MM, HWT101_GetYaw());
   Odometer_Init();
   // TOF200F_Init();
   OLED_Init();
