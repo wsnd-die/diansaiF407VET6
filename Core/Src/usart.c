@@ -83,6 +83,7 @@ void MX_UART5_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN UART5_Init 2 */
+  __HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE);
 
   /* USER CODE END UART5_Init 2 */
 

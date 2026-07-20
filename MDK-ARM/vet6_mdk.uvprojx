@@ -540,6 +540,11 @@
               <FileType>1</FileType>
               <FilePath>..\Core\Src\app.c</FilePath>
             </File>
+            <File>
+              <FileName>UpperCP.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\UpperCP.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

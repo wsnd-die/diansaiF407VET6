@@ -26,6 +26,7 @@
 #include "odometer.h"
 #include "tof200f.h"
 #include "app.h"
+#include "UpperCP.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -292,7 +293,17 @@ void UART4_IRQHandler(void)
 void UART5_IRQHandler(void)
 {
   /* USER CODE BEGIN UART5_IRQn 0 */
+  if (__HAL_UART_GET_FLAG(&huart5, UART_FLAG_ORE) != RESET)
+  {
+    __HAL_UART_CLEAR_OREFLAG(&huart5);
+  }
 
+  if (__HAL_UART_GET_FLAG(&huart5, UART_FLAG_RXNE) != RESET)
+  {
+    uint8_t data = (uint8_t)(huart5.Instance->DR & 0xFF);
+    UpperCP_UartRxByte(data);
+    return;
+  }
   /* USER CODE END UART5_IRQn 0 */
   HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN UART5_IRQn 1 */

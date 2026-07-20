@@ -38,6 +38,7 @@
 #include "overroll.h"
 #include "pca9685.h"
 #include "app.h"
+#include "UpperCP.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -233,11 +234,12 @@ void StartTask02(void *argument)
     OLED_ShowString(24, 6, "        ", 16);
     OLED_ShowFloat(24, 6, g_robot_pos.y, 6, 16);
 
-    /* UART1 输出位置信息 */
+    /* UART6 输出位置信息 */
     int len = snprintf(uart_buf, sizeof(uart_buf),
-                       "X:%.2f Y:%.2f Yaw:%.2f S:%d\r\n",
+                       "X:%.2f Y:%.2f Yaw:%.2f S:%d K:%s RX:%lu B:%02X\r\n",
                        g_robot_pos.x/10, g_robot_pos.y/10, g_robot_pos.yaw,
-                       navigation_state);
+                       navigation_state, UpperCP_GetLastCommand(),
+                       UpperCP_GetRxCount(), UpperCP_GetLastByte());
     HAL_UART_Transmit(&huart6, (uint8_t *)uart_buf, len, 100);
  osDelay(100);
  
@@ -280,6 +282,7 @@ void StartTask04(void *argument)
   App_Init();
   for(;;)
   {
+        UpperCP_RX();
         /* App chain: read current app mode and execute one scheduling step. */
         App_RunCurrentMode();
     osDelay(1);

@@ -62,3 +62,4 @@ vet6_mdk\freertos.o: ../Core/Inc/voice.h
 vet6_mdk\freertos.o: ../Core/Inc/overroll.h
 vet6_mdk\freertos.o: ../Core/Inc/pca9685.h
 vet6_mdk\freertos.o: ../Core/Inc/app.h
+vet6_mdk\freertos.o: ../Core/Inc/UpperCP.h

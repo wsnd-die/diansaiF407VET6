@@ -58,7 +58,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-  int32_t ret;
     float roll, pitch, yaw;
 /* USER CODE END PV */
 

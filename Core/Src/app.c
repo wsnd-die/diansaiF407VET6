@@ -122,6 +122,7 @@ void App_RunCurrentMode(void)
      switch (g_app_mode) {
         case APP_MODE_TEST:
             /* Test mode: currently does nothing, but can be used for debugging or custom tests. */
+            UpperCP_SendTask("send");
             break;
 
         case APP_MODE_IDLE:
