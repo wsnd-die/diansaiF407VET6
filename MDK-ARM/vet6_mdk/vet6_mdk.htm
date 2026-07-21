@@ -3,7 +3,7 @@
 <title>Static Call Graph - [vet6_mdk\vet6_mdk.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image vet6_mdk\vet6_mdk.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Jul 21 16:42:11 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Jul 21 16:56:59 2026
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1302,12 +1302,12 @@ Global Symbols
 <LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UARTEx_RxEventCallback
 </UL>
-<BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART4_IRQHandler
-<LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART6_IRQHandler
+<BR>[Called By]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART6_IRQHandler
 <LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART3_IRQHandler
 <LI><a href="#[34]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART2_IRQHandler
 <LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART1_IRQHandler
 <LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART5_IRQHandler
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART4_IRQHandler
 </UL>
 
 <P><STRONG><a name="[fa]"></a>HAL_UART_Init</STRONG> (Thumb, 100 bytes, Stack size 16 bytes, stm32f4xx_hal_uart.o(i.HAL_UART_Init))
@@ -1587,7 +1587,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[128]"></a>Navigation_TaskTick</STRONG> (Thumb, 54 bytes, Stack size 0 bytes, navigation.o(i.Navigation_TaskTick))
-<BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = Navigation_TaskTick &rArr; Navigation_HandleMoving &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = Navigation_TaskTick &rArr; Navigation_HandleTargetAlign &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_HandleTargetAlign
 <LI><a href="#[123]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_HandleMoving
@@ -1769,7 +1769,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(i.MX_FREERTOS_Init)
 </UL>
 <P><STRONG><a name="[69]"></a>StartTask03</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, freertos.o(i.StartTask03))
-<BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = StartTask03 &rArr; Navigation_TaskTick &rArr; Navigation_HandleMoving &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = StartTask03 &rArr; Navigation_TaskTick &rArr; Navigation_HandleTargetAlign &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[128]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_TaskTick
 <LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_zeroYaw
@@ -2795,8 +2795,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[128]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_TaskTick
 </UL>
 
-<P><STRONG><a name="[123]"></a>Navigation_HandleMoving</STRONG> (Thumb, 366 bytes, Stack size 40 bytes, navigation.o(i.Navigation_HandleMoving))
-<BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = Navigation_HandleMoving &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<P><STRONG><a name="[123]"></a>Navigation_HandleMoving</STRONG> (Thumb, 406 bytes, Stack size 32 bytes, navigation.o(i.Navigation_HandleMoving))
+<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = Navigation_HandleMoving &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetTickCount
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Chassis_SetSpeed

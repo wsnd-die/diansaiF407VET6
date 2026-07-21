@@ -11,16 +11,17 @@
 #define ALIGN_KD                  0.3f          /**< 旋转对齐状态微分系数 */
 #define ALIGN_FF_BASE             0.6f          /**< 旋转对齐状态基础静态摩擦力前馈控制量 */
 #define ALIGN_FF_THRESH           0.15f         /**< 前馈启动阈值（当角度偏差大于此值时使用前馈） */
-#define MAX_ANGULAR               1.2f          /**< 旋转对齐状态下最大角速度限制 (rad/s) */
+#define MAX_ANGULAR               2.0f          /**< 旋转对齐状态下最大角速度限制 (rad/s) */
 #define ALIGN_ERR_THRESH          0.03f         /**< 对齐精度判定阈值 (rad) */
 
 /* 直线行进控制参数 */
 #define MOVE_LINEAR_SPEED         300.0f        /**< 直线行进最大期望线速度 (mm/s) */
+#define MOVE_LINEAR_RAMP          15.0f         /**< 线速度斜坡步长：每个控制周期最大增量 (mm/s)，用于软启动 */
 #define MOVE_ANGULAR_KP           1.5f          /**< 纠偏角速度比例系数 */
 #define MOVE_ANGULAR_KD           0.1f          /**< 纠偏角速度微分系数 */
 #define MOVE_ARRIVE_DIST          10.0f         /**< 目标点判定范围半径，小于 20mm 认为到达 (mm) */
 #define MOVE_MIN_LINEAR           20.0f         /**< 减速时最小保证线速度 (mm/s) */
-#define MOVE_MAX_ANGULAR          0.8f          /**< 直线纠偏中最大角速度限制 (rad/s) */
+#define MOVE_MAX_ANGULAR          1.5f          /**< 直线纠偏中最大角速度限制 (rad/s) */
 
 /* 到达最终角度调整控制参数 */
 #define ARRIVED_ANGULAR_KP        2.0f          /**< 终点旋转比例系数 */
@@ -234,6 +235,7 @@ static void Navigation_HandleMoving(void)
 {
     static Navigation_State_t last_state = NAVIGATION_STATE_IDLE;
     static float last_err;
+    static float current_linear_speed;           /*：当前实际线速度，用于斜坡软启动 */
     static TickType_t last_time;
     float dx = target.x - g_robot_pos.x;
     float dy = target.y - g_robot_pos.y;
@@ -241,21 +243,22 @@ static void Navigation_HandleMoving(void)
     float err;
     float dt;
     float angular_speed;
-    float linear_speed = MOVE_LINEAR_SPEED;
+    float target_linear_speed;
+    float angular_ratio;
     TickType_t now;
 
     /* 到达目标点判定半径内，说明行进完成，进入终点角度微调状态 */
     if (distance < MOVE_ARRIVE_DIST) {
         navigation_state = NAVIGATION_STATE_ARRIVED;
         Chassis_SetSpeed(0.0f, 0.0f);
+        current_linear_speed = 0.0f;
         last_state = NAVIGATION_STATE_IDLE;
         return;
     }
 
     if (last_state != NAVIGATION_STATE_MOVING) {
-        float init_dx = target.x - g_robot_pos.x;
-        float init_dy = target.y - g_robot_pos.y;
-        last_err = Navigation_NormalizeRad(atan2f(init_dx, init_dy) - g_robot_pos.yaw * PI / 180.0f);
+        last_err = 0.0f;
+        current_linear_speed = 0.0f;             /* 方案2：从0开始斜坡起步 */
         last_time = xTaskGetTickCount();
     }
     last_state = NAVIGATION_STATE_MOVING;
@@ -264,7 +267,8 @@ static void Navigation_HandleMoving(void)
     err = Navigation_NormalizeRad(atan2f(dx, dy) - g_robot_pos.yaw * PI / 180.0f);
     now = xTaskGetTickCount();
     dt = (float)(now - last_time) / (float)configTICK_RATE_HZ;
-    if (dt <= 0.0f || dt > 0.1f) {
+    /* 方案3：dt 加下限保护，防止调度过快时微分项被极度放大 */
+    if (dt < 0.01f || dt > 0.1f) {
         dt = 0.01f;
     }
 
@@ -275,16 +279,35 @@ static void Navigation_HandleMoving(void)
     } else if (angular_speed < -MOVE_MAX_ANGULAR) {
         angular_speed = -MOVE_MAX_ANGULAR;
     }
-    
+
     /* 临近终点减速逻辑，距离小于 200mm 时，线速度呈线性比例减小 */
     if (distance < 200.0f) {
-        linear_speed = MOVE_LINEAR_SPEED * distance / 200.0f;
-        if (linear_speed < MOVE_MIN_LINEAR) {
-            linear_speed = MOVE_MIN_LINEAR; /* 限制最小速度，防止死区卡住 */
+        target_linear_speed = MOVE_LINEAR_SPEED * distance / 200.0f;
+        if (target_linear_speed < MOVE_MIN_LINEAR) {
+            target_linear_speed = MOVE_MIN_LINEAR; /* 限制最小速度，防止死区卡住 */
         }
+    } else {
+        target_linear_speed = MOVE_LINEAR_SPEED;
     }
 
-    Chassis_SetSpeed(linear_speed, angular_speed);
+    /* 角速度越大说明偏差越大，按比例压制线速度，防止两轮速差超限打滑 */
+    angular_ratio = fabsf(angular_speed) / MOVE_MAX_ANGULAR; /* 归一化角速度占比 [0, 1] */
+    target_linear_speed *= (1.0f - 0.5f * angular_ratio);    /* 角速度满幅时线速度最多降低 50% */
+    if (target_linear_speed < MOVE_MIN_LINEAR) {
+        target_linear_speed = MOVE_MIN_LINEAR;
+    }
+
+    /* 斜坡滤波，加速时每帧平滑递增，减速时直接跟随（减速无需斜坡） */
+    if (current_linear_speed < target_linear_speed) {
+        current_linear_speed += MOVE_LINEAR_RAMP;
+        if (current_linear_speed > target_linear_speed) {
+            current_linear_speed = target_linear_speed;
+        }
+    } else {
+        current_linear_speed = target_linear_speed;
+    }
+
+    Chassis_SetSpeed(current_linear_speed, angular_speed);
     last_err = err;
     last_time = now;
 }
