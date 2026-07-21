@@ -15,7 +15,7 @@
 #define ALIGN_ERR_THRESH          0.03f         /**< 对齐精度判定阈值 (rad) */
 
 /* 直线行进控制参数 */
-#define MOVE_LINEAR_SPEED         300.0f        /**< 直线行进最大期望线速度 (mm/s) */
+#define MOVE_LINEAR_SPEED         400.0f        /**< 直线行进最大期望线速度 (mm/s) */
 #define MOVE_LINEAR_RAMP          15.0f         /**< 线速度斜坡步长：每个控制周期最大增量 (mm/s)，用于软启动 */
 #define MOVE_ANGULAR_KP           1.5f          /**< 纠偏角速度比例系数 */
 #define MOVE_ANGULAR_KD           0.1f          /**< 纠偏角速度微分系数 */
