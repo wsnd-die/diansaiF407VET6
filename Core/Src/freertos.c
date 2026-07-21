@@ -236,10 +236,9 @@ void StartTask02(void *argument)
 
     /* UART6 输出位置信息 */
     int len = snprintf(uart_buf, sizeof(uart_buf),
-                       "X:%.2f Y:%.2f Yaw:%.2f S:%d K:%s RX:%lu B:%02X\r\n",
+                       "X:%.2f Y:%.2f Yaw:%.2f S:%d K:%s \r\n",
                        g_robot_pos.x/10, g_robot_pos.y/10, g_robot_pos.yaw,
-                       navigation_state, UpperCP_GetLastCommand(),
-                       UpperCP_GetRxCount(), UpperCP_GetLastByte());
+                       navigation_state, UpperCP_GetLastCommand());                     
     HAL_UART_Transmit(&huart6, (uint8_t *)uart_buf, len, 100);
  osDelay(100);
  
@@ -285,7 +284,7 @@ void StartTask04(void *argument)
         UpperCP_RX();
         /* App chain: read current app mode and execute one scheduling step. */
         App_RunCurrentMode();
-    osDelay(1);
+    osDelay(100);
   }
   /* USER CODE END StartTask04 */
 }
@@ -300,10 +299,12 @@ void StartTask04(void *argument)
 void StartTask05(void *argument)
 {
   /* USER CODE BEGIN StartTask05 */
+  // PCA9685_Set180Angle(1U, 0.0f);
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(100);
   }
   /* USER CODE END StartTask05 */
 }
@@ -339,7 +340,7 @@ void StartTask07(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END StartTask07 */
 }

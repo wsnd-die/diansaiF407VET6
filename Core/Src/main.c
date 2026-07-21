@@ -115,10 +115,10 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  if (PCA9685_Init() != 0)//舵机初始化
-  {
-    Error_Handler();
-  }
+ if (PCA9685_Init() != 0)//舵机初始化
+ {
+   Error_Handler();
+ }
   uint32_t hwt_wait_start;
   HWT101_HAL_Init();
   g_hwt101_data_ready = 0;
