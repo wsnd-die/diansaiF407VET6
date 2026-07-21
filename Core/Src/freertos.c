@@ -281,7 +281,7 @@ void StartTask04(void *argument)
   App_Init();
   for(;;)
   {
-        UpperCP_RX();
+        // UpperCP_RX();
         /* App chain: read current app mode and execute one scheduling step. */
         App_RunCurrentMode();
     osDelay(100);

@@ -47,3 +47,4 @@ vet6_mdk\app.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
 vet6_mdk\app.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 vet6_mdk\app.o: ../Core/Inc/usart.h
 vet6_mdk\app.o: ../Core/Inc/bujin.h
+vet6_mdk\app.o: ../Core/Inc/voice.h

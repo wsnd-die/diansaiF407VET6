@@ -4,6 +4,7 @@
 #include "task.h"
 #include "usart.h"
 #include "bujin.h"
+#include "voice.h"
 /* 定义 PI 常量，避免未定义标识符 */
 #ifndef PI
 #define PI 3.14159265358979323846f
@@ -123,8 +124,12 @@ void App_RunCurrentMode(void)
      switch (g_app_mode) {
         case APP_MODE_TEST:
             /* Test mode: currently does nothing, but can be used for debugging or custom tests. */
-//            UpperCP_SendTask("send");
-          Emm_V5_Pos_Control(0x04, 0, 100, 10, 1000.0f, 0, false);
+        //  Chassis_SetSpeed(100.0f, 0.0f);
+        Emm_V5_Pos_Control(0x01, 1, 100, 10, 1000.0f, 1, 1);
+        Emm_V5_Pos_Control(0x02, 1, 100, 10, 1000.0f, 1, 1);
+        Emm_V5_Pos_Control(0x03, 1, 100, 10, 1000.0f, 1, 1);
+        Emm_V5_Pos_Control(0x04, 1, 100, 10, 1000.0f, 1, 1);
+          Emm_V5_Synchronous_motion(0);
             break;
 
         case APP_MODE_IDLE:
@@ -133,6 +138,7 @@ void App_RunCurrentMode(void)
             break;
 
         case APP_MODE_ROUTE_A:
+            Voice_Num(17);
             App_RunRoute(k_route_a, APP_ROUTE_LEN(k_route_a), APP_MODE_ROUTE_C);
             break;
 

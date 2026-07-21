@@ -15,10 +15,10 @@
 #define ALIGN_ERR_THRESH          0.03f         /**< 对齐精度判定阈值 (rad) */
 
 /* 直线行进控制参数 */
-#define MOVE_LINEAR_SPEED         200.0f        /**< 直线行进最大期望线速度 (mm/s) */
+#define MOVE_LINEAR_SPEED         300.0f        /**< 直线行进最大期望线速度 (mm/s) */
 #define MOVE_ANGULAR_KP           1.5f          /**< 纠偏角速度比例系数 */
 #define MOVE_ANGULAR_KD           0.1f          /**< 纠偏角速度微分系数 */
-#define MOVE_ARRIVE_DIST          20.0f         /**< 目标点判定范围半径，小于 20mm 认为到达 (mm) */
+#define MOVE_ARRIVE_DIST          10.0f         /**< 目标点判定范围半径，小于 20mm 认为到达 (mm) */
 #define MOVE_MIN_LINEAR           20.0f         /**< 减速时最小保证线速度 (mm/s) */
 #define MOVE_MAX_ANGULAR          0.8f          /**< 直线纠偏中最大角速度限制 (rad/s) */
 
@@ -253,7 +253,9 @@ static void Navigation_HandleMoving(void)
     }
 
     if (last_state != NAVIGATION_STATE_MOVING) {
-        last_err = 0.0f;
+        float init_dx = target.x - g_robot_pos.x;
+        float init_dy = target.y - g_robot_pos.y;
+        last_err = Navigation_NormalizeRad(atan2f(init_dx, init_dy) - g_robot_pos.yaw * PI / 180.0f);
         last_time = xTaskGetTickCount();
     }
     last_state = NAVIGATION_STATE_MOVING;
