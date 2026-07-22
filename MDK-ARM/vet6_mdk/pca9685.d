@@ -35,3 +35,12 @@ vet6_mdk\pca9685.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 vet6_mdk\pca9685.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 vet6_mdk\pca9685.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 vet6_mdk\pca9685.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+vet6_mdk\pca9685.o: ../Core/Inc/FreeRTOSConfig.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+vet6_mdk\pca9685.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

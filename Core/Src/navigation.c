@@ -43,6 +43,7 @@ float v[2];                                                     /* 保存计算�
 
 static position_t target;                                       /* 当前的导航目标位姿 */
 static position_t start;                                        /* 启动本次导航时的机器人位姿 */
+static bool s_is_reverse_mode = false;                           /* 自动倒车模式标志 */
 
 /* 静态控制函数声明 */
 static void Navigation_HandleIdle(void);
@@ -138,6 +139,20 @@ int8_t Navigation_Request(float target_x_mm, float target_y_mm, float target_yaw
     target.y = target_y_mm;
     target.yaw = target_yaw_rad;
     start = g_robot_pos;
+
+    /* 1. 计算从起始点指向目标点的绝对方位角 */
+    float heading_angle = atan2f(target.x - start.x, target.y - start.y);
+
+    /* 2. 计算如果按正常前进，车头需要旋转的角度偏差 */
+    float fwd_err = Navigation_NormalizeRad(heading_angle - g_robot_pos.yaw * NAV_PI / 180.0f);
+
+    /* 3. 自动倒车判定：当目标点位于车后方（角度偏差绝对值 > 100° ≈ 1.745 rad）时，开启自动倒车模式 */
+    if (fabsf(fwd_err) > 1.745f) {
+        s_is_reverse_mode = true;
+    } else {
+        s_is_reverse_mode = false;
+    }
+
     /* 触发状态机，第一步进行朝向目标点的对齐旋转 */
     navigation_state = NAVIGATION_STATE_TARGET_ALIGN;
     return 0;
@@ -170,7 +185,7 @@ static void Navigation_HandleIdle(void)
 }
 
 /**
- * @brief 原地旋转调整朝向，使机器人正前方向指向目标点
+ * @brief 原地旋转调整朝向，使机器人转向目标点方向（前进时车头对准，倒车时车尾对准）
  */ 
 static void Navigation_HandleTargetAlign(void)
 {
@@ -185,14 +200,21 @@ static void Navigation_HandleTargetAlign(void)
 
     /* 首次进入该状态时，计算两点之间的绝对方位角作为期望旋转朝向 */
     if (last_state != NAVIGATION_STATE_TARGET_ALIGN) {
-        target_yaw = atan2f(target.x - start.x, target.y - start.y);
+        float heading_angle = atan2f(target.x - start.x, target.y - start.y);
+        if (s_is_reverse_mode) {
+            /* 倒车模式：车尾正对目标点 */
+            target_yaw = Navigation_NormalizeRad(heading_angle + NAV_PI);
+        } else {
+            /* 前进模式：车头正对目标点 */
+            target_yaw = heading_angle;
+        }
         last_err = 0.0f;
         last_time = xTaskGetTickCount();
     }
     last_state = NAVIGATION_STATE_TARGET_ALIGN;
 
     /* 偏差角度 = 期望角(rad) - 当前角度(rad) */
-    err = Navigation_NormalizeRad(target_yaw - g_robot_pos.yaw * PI / 180.0f);
+    err = Navigation_NormalizeRad(target_yaw - g_robot_pos.yaw * NAV_PI / 180.0f);
     
     /* 偏差角度小于判定门限，说明朝向已对准目标点，进入直线行进状态 */
     if (fabsf(err) < ALIGN_ERR_THRESH) {
@@ -264,7 +286,10 @@ static void Navigation_HandleMoving(void)
     last_state = NAVIGATION_STATE_MOVING;
 
     /* 纠偏误差：根据当前位置和目标点连线的方位角，对比当前机器人的朝向角度 */
-    err = Navigation_NormalizeRad(atan2f(dx, dy) - g_robot_pos.yaw * PI / 180.0f);
+    float heading_angle = atan2f(dx, dy);
+    float target_heading = s_is_reverse_mode ? Navigation_NormalizeRad(heading_angle + NAV_PI) : heading_angle;
+    err = Navigation_NormalizeRad(target_heading - g_robot_pos.yaw * NAV_PI / 180.0f);
+
     now = xTaskGetTickCount();
     dt = (float)(now - last_time) / (float)configTICK_RATE_HZ;
     /* 方案3：dt 加下限保护，防止调度过快时微分项被极度放大 */
@@ -307,7 +332,9 @@ static void Navigation_HandleMoving(void)
         current_linear_speed = target_linear_speed;
     }
 
-    Chassis_SetSpeed(current_linear_speed, angular_speed);
+    /* 根据倒车模式选择给底盘发送的线速度正负号 */
+    float final_linear_speed = s_is_reverse_mode ? -current_linear_speed : current_linear_speed;
+    Chassis_SetSpeed(final_linear_speed, angular_speed);
     last_err = err;
     last_time = now;
 }

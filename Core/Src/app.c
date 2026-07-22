@@ -140,7 +140,7 @@ void App_RunCurrentMode(void)
 
         case APP_MODE_ROUTE_A:
             Voice_Num(17);
-            osdelay(1000);
+            vTaskDelay(pdMS_TO_TICKS(100));
             App_RunRoute(k_route_a, APP_ROUTE_LEN(k_route_a), APP_MODE_ROUTE_C);
             break;
 
@@ -178,11 +178,15 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
         /* 请求导航到当前航点坐标 */
         (void)Navigation_Request(route[i].x_mm, route[i].y_mm, route[i].yaw_rad);
 
-        /* 等待导航模块到达目标点（进入闲置状态），且保证系统未被外部中止 */
+        /* 1. 等待导航模块到达目标点（底盘运动中，舵机保持不动） */
         while (!Navigation_IsIdle() && App_IsRunning()) {
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }
+
+        /* 2. 到达目标点且底盘停稳后，再执行舵机摆动动作（等舵机动完才进入下一个航点） */
+        if (App_IsRunning()) {
             PCA9685_Set180AngleSmooth(1U, 90.0f, 100U, 10U);
             PCA9685_Set180AngleSmooth(1U, -90.0f, 100U, 10U);
-            vTaskDelay(pdMS_TO_TICKS(50));
         }
     }
 
