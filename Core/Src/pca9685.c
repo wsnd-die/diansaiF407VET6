@@ -1,5 +1,7 @@
 #include "pca9685.h"
 #include "i2c.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 #define PCA9685_ADDRESS          (0x40U << 1)
 #define PCA9685_MODE1            0x00U
@@ -7,6 +9,9 @@
 #define PCA9685_LED0_ON_L        0x06U
 #define PCA9685_PRESCALE_50HZ    121U
 #define PCA9685_270_CENTER_DEG   10.0f
+
+/* 全局静态数组：保存通道 1~4 舵机的当前角度（初始默认为 0.0 度） */
+static float s_pca9685_180_angles[5] = {0.0f};
 
 static int32_t PCA9685_Write(uint8_t reg, uint8_t *data, uint16_t len)
 {
@@ -87,6 +92,16 @@ int32_t PCA9685_Set270Angle(float angle_deg)
         PCA9685_AngleToPulseUs(angle_deg + PCA9685_270_CENTER_DEG, 135.0f)));
 }
 
+float PCA9685_Get180Angle(uint8_t channel)
+{
+    if (channel < 1U || channel > 4U)
+    {
+        return 0.0f;
+    }
+
+    return s_pca9685_180_angles[channel];
+}
+
 int32_t PCA9685_Set180Angle(uint8_t channel, float angle_deg)
 {
     if (channel < 1U || channel > 4U)
@@ -94,6 +109,47 @@ int32_t PCA9685_Set180Angle(uint8_t channel, float angle_deg)
         return -1;
     }
 
+    /* 记录并更新当前通道的角度状态 */
+    s_pca9685_180_angles[channel] = angle_deg;
+
     return PCA9685_SetTicks(channel, PCA9685_PulseUsToTicks(
         PCA9685_AngleToPulseUs(angle_deg, 90.0f)));
+}
+
+int32_t PCA9685_Set180AngleSmooth(uint8_t channel, float target_angle_deg, uint16_t steps, uint32_t step_delay_ms)
+{
+    if (channel < 1U || channel > 4U || steps == 0U)
+    {
+        return -1;
+    }
+
+    /* 1. 读取当前角度，计算目标偏差 err */
+    float current_angle = s_pca9685_180_angles[channel];
+    float err = target_angle_deg - current_angle;
+
+    /* 2. 计算每一步的角度递增量 */
+    float step_angle = err / (float)steps;
+
+    /* 3. 循环将动作分为 steps 次执行，确保运动丝滑 */
+    for (uint16_t i = 0U; i < steps; i++)
+    {
+        current_angle += step_angle;
+        (void)PCA9685_Set180Angle(channel, current_angle);
+
+        if (step_delay_ms > 0U)
+        {
+            /* 若 RTOS 调度器已运行，使用 vTaskDelay 让出 CPU；否则使用 HAL_Delay */
+            if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING)
+            {
+                vTaskDelay(pdMS_TO_TICKS(step_delay_ms));
+            }
+            else
+            {
+                HAL_Delay(step_delay_ms);
+            }
+        }
+    }
+
+    /* 4. 确保最终精准到达目标角度 */
+    return PCA9685_Set180Angle(channel, target_angle_deg);
 }

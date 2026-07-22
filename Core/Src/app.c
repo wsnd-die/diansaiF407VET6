@@ -5,6 +5,7 @@
 #include "usart.h"
 #include "bujin.h"
 #include "voice.h"
+#include "pca9685.h"
 /* 定义 PI 常量，避免未定义标识符 */
 #ifndef PI
 #define PI 3.14159265358979323846f
@@ -28,7 +29,7 @@ static const AppWaypoint_t k_route_a[] = {
     WAYPOINT(0.0f, 1250.0f, 0.0f),
     WAYPOINT(0.0f, 1750.0f, 0.0f),
     WAYPOINT(0.0f, 2250.0f, 0.0f),
-    WAYPOINT(0.0f, 0.0f, -PI / 2.0f),
+    WAYPOINT(0.0f, 0.0f, 0.0f),
 };
 
 /* 航线 C 的目标路径点序列 */
@@ -139,6 +140,7 @@ void App_RunCurrentMode(void)
 
         case APP_MODE_ROUTE_A:
             Voice_Num(17);
+            osdelay(1000);
             App_RunRoute(k_route_a, APP_ROUTE_LEN(k_route_a), APP_MODE_ROUTE_C);
             break;
 
@@ -178,7 +180,9 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
 
         /* 等待导航模块到达目标点（进入闲置状态），且保证系统未被外部中止 */
         while (!Navigation_IsIdle() && App_IsRunning()) {
-            vTaskDelay(pdMS_TO_TICKS(50)); /* 延时 50ms */
+            PCA9685_Set180AngleSmooth(1U, 90.0f, 100U, 10U);
+            PCA9685_Set180AngleSmooth(1U, -90.0f, 100U, 10U);
+            vTaskDelay(pdMS_TO_TICKS(50));
         }
     }
 

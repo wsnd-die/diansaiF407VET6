@@ -12,7 +12,7 @@
 #define ALIGN_FF_BASE             0.6f          /**< 旋转对齐状态基础静态摩擦力前馈控制量 */
 #define ALIGN_FF_THRESH           0.15f         /**< 前馈启动阈值（当角度偏差大于此值时使用前馈） */
 #define MAX_ANGULAR               2.0f          /**< 旋转对齐状态下最大角速度限制 (rad/s) */
-#define ALIGN_ERR_THRESH          0.03f         /**< 对齐精度判定阈值 (rad) */
+#define ALIGN_ERR_THRESH          0.01f         /**< 对齐精度判定阈值 (rad) */
 
 /* 直线行进控制参数 */
 #define MOVE_LINEAR_SPEED         400.0f        /**< 直线行进最大期望线速度 (mm/s) */
@@ -171,7 +171,7 @@ static void Navigation_HandleIdle(void)
 
 /**
  * @brief 原地旋转调整朝向，使机器人正前方向指向目标点
- */
+ */ 
 static void Navigation_HandleTargetAlign(void)
 {
     static Navigation_State_t last_state = NAVIGATION_STATE_IDLE;
