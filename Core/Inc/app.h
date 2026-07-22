@@ -22,6 +22,7 @@ typedef struct {
     float x_mm;         /**< 目标点 X 坐标，单位：毫米 */
     float y_mm;         /**< 目标点 Y 坐标，单位：毫米 */
     float yaw_rad;      /**< 目标点朝向角，单位：弧度 */
+    bool has_action;    /**< 是否在到达目标点后执行舵机动作 (true/false) */
 } AppWaypoint_t;
 
 /* 全局应用模式变量，由导航任务或串口控制修改 */

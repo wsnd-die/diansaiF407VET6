@@ -26,7 +26,7 @@
 /* 到达最终角度调整控制参数 */
 #define ARRIVED_ANGULAR_KP        2.0f          /**< 终点旋转比例系数 */
 #define ARRIVED_ANGULAR_KD        0.1f          /**< 终点旋转微分系数 */
-#define ARRIVED_MAX_ANGULAR       0.6f          /**< 终点最大角速度限制 (rad/s) */
+#define ARRIVED_MAX_ANGULAR       1.5f          /**< 终点最大角速度限制 (rad/s) */
 #define ARRIVED_ERR_THRESH        0.02f         /**< 最终角度对齐允许最大误差 (rad) */
 
 /* 状态机全局变量 */

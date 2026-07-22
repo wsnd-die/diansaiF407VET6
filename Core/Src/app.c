@@ -13,8 +13,10 @@
 
 /* 获取航线数组的元素个数 */
 #define APP_ROUTE_LEN(route) ((uint8_t)(sizeof(route) / sizeof((route)[0])))
-/* 方便定义路径点（X_mm, Y_mm, Yaw_rad）的辅助宏 */
-#define WAYPOINT(x, y, yaw)  {(x), (y), (yaw)}
+/* 方便定义路径点（X_mm, Y_mm, Yaw_rad, has_action）的辅助宏 */
+#define WAYPOINT(x, y, yaw, act)    {(x), (y), (yaw), (act)}
+#define WAYPOINT_NO_ACT(x, y, yaw)  {(x), (y), (yaw), false}
+#define WAYPOINT_ACT(x, y, yaw)     {(x), (y), (yaw), true}
 
 /* 当前系统的全局应用模式 */
 volatile AppMode_t g_app_mode = APP_MODE_IDLE;
@@ -25,27 +27,27 @@ static volatile bool s_stop_requested;
 
 /* 航线 A 的目标路径点序列 */
 static const AppWaypoint_t k_route_a[] = {
-    WAYPOINT(0.0f, 750.0f, 0.0f),
-    WAYPOINT(0.0f, 1250.0f, 0.0f),
-    WAYPOINT(0.0f, 1750.0f, 0.0f),
-    WAYPOINT(0.0f, 2250.0f, 0.0f),
-    WAYPOINT(0.0f, 0.0f, 0.0f),
+    WAYPOINT(0.0f, 700.0f, 0.0f, 1),
+    WAYPOINT(0.0f, 1200.0f, 0.0f, 1),
+    WAYPOINT(0.0f, 1700.0f, 0.0f, 1),
+    WAYPOINT(0.0f, 2200.0f, 0.0f, 1),
+    WAYPOINT(0.0f, 0.0f, 0.0f, 0),
 };
 
 /* 航线 C 的目标路径点序列 */
 static const AppWaypoint_t k_route_c[] = {
-    WAYPOINT(-1900.0f, 0.0f, 0.0f),
-    WAYPOINT(-1900.0f, 450.0f, 0.0f),
-    WAYPOINT(-1900.0f, 950.0f, 0.0f),
-    WAYPOINT(-1900.0f, 1450.0f, 0.0f),
-    WAYPOINT(-1900.0f, 1950.0f, 0.0f),
-    WAYPOINT(-1900.0f, 2450.0f, 0.0f),
-    WAYPOINT(-2700.0f, 2450.0f, -PI),
-    WAYPOINT(-2700.0f, 1950.0f, -PI),
-    WAYPOINT(-2700.0f, 1450.0f, -PI),
-    WAYPOINT(-2700.0f, 950.0f, -PI),
-    WAYPOINT(-2700.0f, 450.0f, -PI),
-    WAYPOINT(-2700.0f, 0.0f, -PI),
+    WAYPOINT(-1900.0f, 0.0f, 0.0f, false),
+    WAYPOINT(-1900.0f, 450.0f, 0.0f, false),
+    WAYPOINT(-1900.0f, 950.0f, 0.0f, false),
+    WAYPOINT(-1900.0f, 1450.0f, 0.0f, false),
+    WAYPOINT(-1900.0f, 1950.0f, 0.0f, false),
+    WAYPOINT(-1900.0f, 2450.0f, 0.0f, false),
+    WAYPOINT(-2700.0f, 2450.0f, -PI, false),
+    WAYPOINT(-2700.0f, 1950.0f, -PI, false),
+    WAYPOINT(-2700.0f, 1450.0f, -PI, false),
+    WAYPOINT(-2700.0f, 950.0f, -PI, false),
+    WAYPOINT(-2700.0f, 450.0f, -PI, false),
+    WAYPOINT(-2700.0f, 0.0f, -PI, false),
 };
 
 /* 内部静态函数：执行特定的一组航线点，并跳转到指定的下一个模式 */
@@ -183,8 +185,8 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
             vTaskDelay(pdMS_TO_TICKS(50));
         }
 
-        /* 2. 到达目标点且底盘停稳后，再执行舵机摆动动作（等舵机动完才进入下一个航点） */
-        if (App_IsRunning()) {
+        /* 2. 到达目标点且底盘停稳后，只有当该航点配置了 has_action == true 时才执行舵机动作 */
+        if (App_IsRunning() && route[i].has_action) {
             PCA9685_Set180AngleSmooth(1U, 90.0f, 100U, 10U);
             PCA9685_Set180AngleSmooth(1U, -90.0f, 100U, 10U);
         }

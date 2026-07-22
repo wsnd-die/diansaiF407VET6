@@ -3,7 +3,7 @@
 <title>Static Call Graph - [vet6_mdk\vet6_mdk.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image vet6_mdk\vet6_mdk.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed Jul 22 11:32:55 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed Jul 22 12:06:56 2026
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -890,7 +890,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[b1]"></a>App_RunCurrentMode</STRONG> (Thumb, 204 bytes, Stack size 24 bytes, app.o(i.App_RunCurrentMode))
-<BR><BR>[Stack]<UL><LI>Max Depth = 280<LI>Call Chain = App_RunCurrentMode &rArr; App_RunRoute &rArr; Navigation_Stop &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = App_RunCurrentMode &rArr; App_RunRoute &rArr; Navigation_Stop &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_Stop
 <LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Synchronous_motion
@@ -1808,7 +1808,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(i.MX_FREERTOS_Init)
 </UL>
 <P><STRONG><a name="[6a]"></a>StartTask04</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, freertos.o(i.StartTask04))
-<BR><BR>[Stack]<UL><LI>Max Depth = 280<LI>Call Chain = StartTask04 &rArr; App_RunCurrentMode &rArr; App_RunRoute &rArr; Navigation_Stop &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = StartTask04 &rArr; App_RunCurrentMode &rArr; App_RunRoute &rArr; Navigation_Stop &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[148]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;App_RunCurrentMode
@@ -2966,8 +2966,8 @@ Local Symbols
 <LI><a href="#[146]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PCA9685_SetTicks
 </UL>
 
-<P><STRONG><a name="[b7]"></a>App_RunRoute</STRONG> (Thumb, 120 bytes, Stack size 24 bytes, app.o(i.App_RunRoute))
-<BR><BR>[Stack]<UL><LI>Max Depth = 256<LI>Call Chain = App_RunRoute &rArr; Navigation_Stop &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<P><STRONG><a name="[b7]"></a>App_RunRoute</STRONG> (Thumb, 132 bytes, Stack size 32 bytes, app.o(i.App_RunRoute))
+<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = App_RunRoute &rArr; Navigation_Stop &rArr; Chassis_SetSpeed &rArr; Emm_V5_Vel_Control &rArr; Emm_Send &rArr; osMutexAcquire &rArr; xQueueTakeMutexRecursive &rArr; xQueueSemaphoreTake &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_Stop
 <LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Navigation_Request
