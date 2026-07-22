@@ -32,6 +32,7 @@ static const AppWaypoint_t k_route_a[] = {
     WAYPOINT(0.0f, 1700.0f, 0.0f, 1),
     WAYPOINT(0.0f, 2200.0f, 0.0f, 1),
     WAYPOINT(0.0f, 0.0f, 0.0f, 0),
+    WAYPOINT(-1900.0f, 0.0f, 0.0f, false),
 };
 
 /* 航线 C 的目标路径点序列 */
@@ -155,7 +156,8 @@ void App_RunCurrentMode(void)
              * Preserve the current behavior: route C leaves the app in route C
              * after completion, so the scheduler can enter it again.
              */
-            App_RunRoute(k_route_c, APP_ROUTE_LEN(k_route_c), APP_MODE_ROUTE_C);
+            // App_RunRoute(k_route_c, APP_ROUTE_LEN(k_route_c), APP_MODE_IDLE);
+            App_RouteC_PlanAndRun(0, (const uint8_t[]){4,5,6}, 3, APP_MODE_IDLE);
             break;
 
         default:
@@ -205,5 +207,113 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
 
     /* 切换到下一个运行模式 */
     App_SetMode(next_mode);
+}
+
+/**
+ * @brief  C区环形拓扑多目标点最短路径规划与导航执行函数
+ * @details C区 12 个节点的环形轨道拓扑结构示意图：
+ * 
+ *               (y = 2450)
+ *      [6] <------------------ [5]
+ *       |                       |
+ *      [7]                     [4]
+ *       |                       |
+ *      [8]                     [3]
+ *       |                       |
+ *      [9]                     [2]
+ *       |                       |
+ *     [10]                     [1]
+ *       |                       |
+ *      [11] -----------------> [0]
+ *               (y = 0)
+ *   (x = -2700)             (x = -1900)
+ * 
+ *          算法原理：
+ *          1. C区拥有 12 个离散顶点 (0~11)，闭合成一个矩形环形轨道赛道。
+ *          2. 传入起点 node 编号与待访问目标点列表 `target_nodes`。
+ *          3. 评估顺时针 (Clockwise) 与逆时针 (Counter-Clockwise) 遍历完所有目标节点所需的跨越步数。
+ *          4. 自动选取总步数最少的绕行方向（路程最短）。
+ *          5. 沿途生成航点队列，目标节点置 `has_action = true`（到点停稳后触发舵机作业），
+ *             过路节点置 `has_action = false`（只经过不停留/不动舵机）。
+ *          6. 调用 `App_RunRoute` 驱动小车高效完成多目标任务。
+ * 
+ * @param  start_node_idx 起始节点编号 (0 ~ 11)
+ * @param  target_nodes   待访问的目标节点编号数组
+ * @param  num_targets    目标节点数量
+ * @param  next_mode      完成后跳转的下一个模式
+ * @return 0 成功启动，-1 参数错误
+ */
+int32_t App_RouteC_PlanAndRun(uint8_t start_node_idx, const uint8_t *target_nodes,
+                              uint8_t num_targets, AppMode_t next_mode)
+{
+    uint8_t i;
+    uint8_t step;
+    uint8_t curr;
+    uint8_t cw_steps = 0U;
+    uint8_t ccw_steps = 0U;
+    bool is_target[12] = {false};
+
+    /* 参数有效性校验：节点必须在 0~11 范围内 */
+    if (start_node_idx >= 12U || target_nodes == NULL || num_targets == 0U) {
+        return -1;
+    }
+
+    /* 标记待访问的目标节点索引，便于快速查询 */
+    for (i = 0U; i < num_targets; i++) {
+        if (target_nodes[i] < 12U) {
+            is_target[target_nodes[i]] = true;
+        }
+    }
+
+    /* --- 步骤 1: 评估【顺时针方向】扫完所有目标点所需的跨越步数 --- */
+    curr = start_node_idx;
+    for (step = 1U; step <= 12U; step++) {
+        curr = (curr + 1U) % 12U; /* 顺时针递增索引，超出 11 取模归零 */
+        if (is_target[curr]) {
+            cw_steps = step;     /* 更新覆盖全部目标所需的最后步数 */
+        }
+    }
+
+    /* --- 步骤 2: 评估【逆时针方向】扫完所有目标点所需的跨越步数 --- */
+    curr = start_node_idx;
+    for (step = 1U; step <= 12U; step++) {
+        curr = (curr == 0U) ? 11U : (curr - 1U); /* 逆时针递减索引，小于 0 回到 11 */
+        if (is_target[curr]) {
+            ccw_steps = step;    /* 更新覆盖全部目标所需的最后步数 */
+        }
+    }
+
+    /* --- 步骤 3: 比较顺时针与逆时针路径长度，选取最省时间的偏好方向 --- */
+    bool choose_cw = (cw_steps <= ccw_steps);
+    uint8_t best_steps = choose_cw ? cw_steps : ccw_steps;
+
+    /* 若未命中任何有效目标节点，直接返回 */
+    if (best_steps == 0U) {
+        return 0;
+    }
+
+    /* --- 步骤 4: 动态构建沿途最优化路径节点序列（最多 12 个顶点） --- */
+    AppWaypoint_t dynamic_route[12];
+    curr = start_node_idx;
+
+    for (i = 0U; i < best_steps; i++) {
+        /* 根据决定的最优方向走下一步 */
+        if (choose_cw) {
+            curr = (curr + 1U) % 12U;
+        } else {
+            curr = (curr == 0U) ? 11U : (curr - 1U);
+        }
+
+        /* 从 C 区基础赛道数据中拷贝坐标与姿态角 */
+        dynamic_route[i] = k_route_c[curr];
+
+        /* 若该点属于目标节点，设置到点后执行舵机作业 (true)；若是中途过路点则不触发 (false) */
+        dynamic_route[i].has_action = is_target[curr];
+    }
+
+    /* --- 步骤 5: 下发给底层导航，依次完成赛道行驶与到点舵机作业 --- */
+    App_RunRoute(dynamic_route, best_steps, next_mode);
+
+    return 0;
 }
 

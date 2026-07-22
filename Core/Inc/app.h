@@ -56,5 +56,34 @@ bool App_IsRunning(void);
  */
 void App_CommandUartRxByte(uint8_t data);
 
-#endif
+/**
+ * @brief  C区环形拓扑多目标点最短路径规划与导航执行函数
+ * @details C区环形轨道拓扑结构示意图：
+ * 
+ *               (y = 2450)
+ *      [6] <------------------ [5]
+ *       |                       |
+ *      [7]                     [4]
+ *       |                       |
+ *      [8]                     [3]
+ *       |                       |
+ *      [9]                     [2]
+ *       |                       |
+ *     [10]                     [1]
+ *       |                       |
+ *      [11] -----------------> [0]
+ *               (y = 0)
+ *   (x = -2700)             (x = -1900)
+ * 
+ *          根据当前节点与待访问目标节点列表，自动对比顺时针/逆时针巡航的总路程，
+ *          选取最短路径生成过渡航点与作业动作，并驱动小车完成自动化巡航。
+ * @param  start_node_idx 起始节点编号 (0 ~ 11)
+ * @param  target_nodes   待访问的目标节点编号数组
+ * @param  num_targets    目标节点数量
+ * @param  next_mode      完成后跳转的下一个模式
+ * @return 0 成功启动，-1 参数错误
+ */
+int32_t App_RouteC_PlanAndRun(uint8_t start_node_idx, const uint8_t *target_nodes,
+                              uint8_t num_targets, AppMode_t next_mode);
 
+#endif
