@@ -1,1 +1,16 @@
 .worktrees/
+
+# Ignore everything except Core (拉通对齐：Core 是唯一交付物，其余均为工程噪声)
+/.agents/
+/.codex/
+/.mxproject
+/.vscode/
+/Drivers/
+/MDK-ARM/
+/Middlewares/
+/debug.log
+/docs/
+/output/
+/tests/
+/tools/
+/vet6_mdk.ioc

@@ -32,22 +32,22 @@ static const AppWaypoint_t k_route_a[] = {
     WAYPOINT(0.0f, 1700.0f, 0.0f, 1),
     WAYPOINT(0.0f, 2200.0f, 0.0f, 1),
     WAYPOINT(0.0f, 0.0f, 0.0f, 0),
-    WAYPOINT(-1900.0f, 0.0f, 0.0f, false),
+    WAYPOINT(-1950.0f, 0.0f, 0.0f, false),
 };
 
 /* 航线 C 的目标路径点序列 */
 static const AppWaypoint_t k_route_c[] = {
-    WAYPOINT(-1900.0f, 0.0f, 0.0f, false),
-    WAYPOINT(-1900.0f, 450.0f, 0.0f, false),
-    WAYPOINT(-1900.0f, 950.0f, 0.0f, false),
-    WAYPOINT(-1900.0f, 1450.0f, 0.0f, false),
-    WAYPOINT(-1900.0f, 1950.0f, 0.0f, false),
-    WAYPOINT(-1900.0f, 2450.0f, 0.0f, false),
-    WAYPOINT(-2700.0f, 2450.0f, -PI, false),
-    WAYPOINT(-2700.0f, 1950.0f, -PI, false),
-    WAYPOINT(-2700.0f, 1450.0f, -PI, false),
-    WAYPOINT(-2700.0f, 950.0f, -PI, false),
-    WAYPOINT(-2700.0f, 450.0f, -PI, false),
+    WAYPOINT(-1950.0f, 0.0f, 0.0f, false),
+    WAYPOINT(-1950.0f, 500.0f, 0.0f, false),
+    WAYPOINT(-1950.0f, 1000.0f, 0.0f, false),
+    WAYPOINT(-1950.0f, 1500.0f, 0.0f, false),
+    WAYPOINT(-1950.0f, 2000.0f, 0.0f, false),
+    WAYPOINT(-1950.0f, 2500.0f, 0.0f, false),
+    WAYPOINT(-2700.0f, 2500.0f, -PI, false),
+    WAYPOINT(-2700.0f, 2000.0f, -PI, false),
+    WAYPOINT(-2700.0f, 1500.0f, -PI, false),
+    WAYPOINT(-2700.0f, 1000.0f, -PI, false),
+    WAYPOINT(-2700.0f, 500.0f, -PI, false),
     WAYPOINT(-2700.0f, 0.0f, -PI, false),
 };
 
@@ -157,7 +157,7 @@ void App_RunCurrentMode(void)
              * after completion, so the scheduler can enter it again.
              */
             // App_RunRoute(k_route_c, APP_ROUTE_LEN(k_route_c), APP_MODE_IDLE);
-            App_RouteC_PlanAndRun(0, (const uint8_t[]){4,5,6}, 3, APP_MODE_IDLE);
+            App_RouteC_PlanAndRun(0, (const uint8_t[]){2,4,7,9,10}, 5, APP_MODE_IDLE);
             break;
 
         default:
@@ -292,8 +292,8 @@ int32_t App_RouteC_PlanAndRun(uint8_t start_node_idx, const uint8_t *target_node
         return 0;
     }
 
-    /* --- 步骤 4: 动态构建沿途最优化路径节点序列（最多 12 个顶点） --- */
-    AppWaypoint_t dynamic_route[12];
+    /* --- 步骤 4: 提取沿途原始基础节点序列 --- */
+    AppWaypoint_t temp_route[12];
     curr = start_node_idx;
 
     for (i = 0U; i < best_steps; i++) {
@@ -305,14 +305,43 @@ int32_t App_RouteC_PlanAndRun(uint8_t start_node_idx, const uint8_t *target_node
         }
 
         /* 从 C 区基础赛道数据中拷贝坐标与姿态角 */
-        dynamic_route[i] = k_route_c[curr];
+        temp_route[i] = k_route_c[curr];
 
         /* 若该点属于目标节点，设置到点后执行舵机作业 (true)；若是中途过路点则不触发 (false) */
-        dynamic_route[i].has_action = is_target[curr];
+        temp_route[i].has_action = is_target[curr];
     }
 
-    /* --- 步骤 5: 下发给底层导航，依次完成赛道行驶与到点舵机作业 --- */
-    App_RunRoute(dynamic_route, best_steps, next_mode);
+    /* --- 步骤 5: 优化路径 —— 剔除直线上无动作的冗余中间点，严格保留作业点与四大拐角枢纽点 (0, 5, 6, 11) --- */
+    AppWaypoint_t dynamic_route[12];
+    uint8_t out_len = 0U;
+
+    for (i = 0U; i < best_steps; i++) {
+        /* 计算当前点对应的 C 区节点原始索引编号 (0~11) */
+        uint8_t node_idx;
+        if (choose_cw) {
+            node_idx = (start_node_idx + i + 1U) % 12U;
+        } else {
+            node_idx = (start_node_idx + 12U - ((i + 1U) % 12U)) % 12U;
+        }
+
+        AppWaypoint_t curr_pt = temp_route[i];
+
+        /*
+         * 节点保留规则（满足任一条件即保留）：
+         * 1. 目标作业点 (has_action == true)；
+         * 2. 本次路线的最后一个终点 (i == best_steps - 1)；
+         * 3. 赛道四大转弯拐角枢纽节点 (0, 5, 6, 11)，必须保留，绝不斜切撞树！
+         */
+        bool is_corner_node = (node_idx == 0U || node_idx == 5U || node_idx == 6U || node_idx == 11U);
+
+        if (curr_pt.has_action || (i == best_steps - 1U) || is_corner_node) {
+            dynamic_route[out_len++] = curr_pt;
+        }
+        /* 属于直线上无动作的冗余中间节点（如 1,3,8 等），直接剔除，大直线高速通畅行驶 */
+    }
+
+    /* --- 步骤 6: 下发给底层导航，沿赛道外围一路畅通执行 --- */
+    App_RunRoute(dynamic_route, out_len, next_mode);
 
     return 0;
 }

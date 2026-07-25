@@ -279,6 +279,12 @@ void StartTask04(void *argument)
   /* USER CODE BEGIN StartTask04 */
   /* Infinite loop */
   App_Init();
+//    PCA9685_Set180Angle(1U,80.0f);
+    PCA9685_Set270Angle(0.0f);
+        osDelay(1000);
+      PCA9685_Set270Angle(-80.0f);
+    osDelay(1000);
+    PCA9685_Set270Angle(-100.0f);
   for(;;)
   {
         // UpperCP_RX();
