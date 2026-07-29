@@ -1,11 +1,8 @@
 #include "app.h"
-#include "navigation.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "usart.h"
 #include "bujin.h"
-#include "voice.h"
-#include "pca9685.h"
 /* 定义 PI 常量，避免未定义标识符 */
 #ifndef PI
 #define PI 3.14159265358979323846f
@@ -120,7 +117,7 @@ void App_RunCurrentMode(void)
 {
         if (s_stop_requested) {
             s_stop_requested = false;
-            Navigation_Stop();
+            /* Navigation_Stop(); -- navigation.c removed */
             return;
         }
 
@@ -142,7 +139,7 @@ void App_RunCurrentMode(void)
             break;
 
         case APP_MODE_ROUTE_A:
-            Voice_Num(17);
+            /* Voice_Num(17); -- voice.c removed */
             vTaskDelay(pdMS_TO_TICKS(100));
             App_RunRoute(k_route_a, APP_ROUTE_LEN(k_route_a), APP_MODE_ROUTE_C);
             break;
@@ -175,38 +172,12 @@ void App_RunCurrentMode(void)
 static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
                          AppMode_t next_mode)
 {
-    uint8_t i;
-
-    /* 逐个航点遍历，确保系统仍处于运行状态 */
-    for (i = 0U; i < route_len && App_IsRunning(); i++) {
-        /* 请求导航到当前航点坐标 */
-        (void)Navigation_Request(route[i].x_mm, route[i].y_mm, route[i].yaw_rad);
-
-        /* 1. 等待导航模块到达目标点（底盘运动中，舵机保持不动） */
-        while (!Navigation_IsIdle() && App_IsRunning()) {
-            vTaskDelay(pdMS_TO_TICKS(50));
-        }
-
-        /* 2. 到达目标点且底盘停稳后，只有当该航点配置了 has_action == true 时才执行舵机动作 */
-        if (App_IsRunning() && route[i].has_action) {
-            PCA9685_Set180AngleSmooth(1U, 90.0f, 100U, 10U);
-            PCA9685_Set180AngleSmooth(1U, -90.0f, 100U, 10U);
-        }
-    }
-
-    /* 如果中途被停止，直接退出 */
-    if (!App_IsRunning()) {
-        return;
-    }
-
-    /* 如果下一步是空闲模式，重置运行状态并停止底盘 */
-    if (next_mode == APP_MODE_IDLE) {
-        s_app_running = false;
-        Navigation_Stop();
-    }
-
-    /* 切换到下一个运行模式 */
-    App_SetMode(next_mode);
+    /* TODO: Navigation and PCA9685 modules removed.
+     * Re-implement when replacement hardware drivers are ready. */
+    (void)route;
+    (void)route_len;
+    (void)next_mode;
+    s_app_running = false;
 }
 
 /**

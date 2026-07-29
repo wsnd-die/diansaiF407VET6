@@ -1,7 +1,5 @@
 #include "UpperCP.h"
-#include "navigation.h"
 #include "usart.h"
-#include "voice.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -168,9 +166,8 @@ void speed_func(void)
             sscanf(p_num, "%d", &temp_num);
         }
 
-        speed.tar = (float)temp_num;
-        speed.diff = (speed.tar - speed.real) / 8.0f;
-
+        /* speed struct removed with navigation.c */
+        (void)temp_num;
         *ret = 0;
     }
 }
@@ -185,9 +182,8 @@ void angle_func(void)
             sscanf(p_num, "%d", &temp_num);
         }
 
-        angle_speed.tar = (float)temp_num;
-        angle_speed.diff = (angle_speed.tar - angle_speed.real) / 8.0f;
-
+        /* angle_speed struct removed with navigation.c */
+        (void)temp_num;
         *ret = 0;
     }
 }
@@ -202,8 +198,8 @@ void face_func(void)
             sscanf(p_num, "%f", &temp_num);
         }
 
-        TarAngle = (int)temp_num;
-
+        /* TarAngle removed with navigation.c */
+        (void)temp_num;
         *ret = 0;
     }
 }
@@ -218,7 +214,8 @@ void voice_func(void)
             sscanf(p_num, "%d", &temp_num);
         }
 
-        Voice_Num(temp_num);
+        /* Voice_Num(temp_num); -- voice.c removed */
+        (void)temp_num;
 
         *ret = 0;
     }
@@ -271,7 +268,8 @@ void Move_func(void)
             Serial5_Printf("move %.2f\r\n", temp_num);
         }
 
-        TarPos = temp_num;
+        /* TarPos removed with navigation.c */
+        (void)temp_num;
         *ret = 0;
     }
 }

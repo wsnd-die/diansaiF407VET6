@@ -23,8 +23,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hwt101_hal.h"
-#include "odometer.h"
-#include "tof200f.h"
 #include "app.h"
 #include "UpperCP.h"
 /* USER CODE END Includes */
@@ -184,7 +182,8 @@ void USART1_IRQHandler(void)
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) != RESET)
   {
     uint8_t data = (uint8_t)(huart1.Instance->DR & 0xFF);
-    TOF200F_UartRxByte(data);
+    /* TOF200F_UartRxByte(data); -- tof200f.c removed */
+    (void)data;
     return;
   }
 
@@ -209,7 +208,8 @@ void USART2_IRQHandler(void)
   if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) != RESET)
   {
     uint8_t data = (uint8_t)(huart2.Instance->DR & 0xFF);
-    Odometer_UartRxByte(data);
+    /* Odometer_UartRxByte(data); -- odometer.c removed */
+    (void)data;
     return;
   }
 

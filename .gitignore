@@ -26,5 +26,16 @@
 *.iex
 *.htm
 *.lnp
+*.Bak
+*.dbgconf
 build.log
+JLinkLog.txt
+JLinkSettings.ini
+
+# Keil MDK 用户/自动生成文件
 *.uvguix.*
+*.uvoptx
+MDK-ARM/DebugConfig/
+MDK-ARM/RTE/
+MDK-ARM/startup_stm32f407xx.s
+MDK-ARM/startup_stm32f407xx.lst

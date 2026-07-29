@@ -31,12 +31,7 @@
 #include "hwt101_hal.h"
 #include "oled.h"
 #include "bujin.h"
-#include "odometer.h"
-#include "tof200f.h"
-#include "navigation.h"
-#include "voice.h"
 #include "overroll.h"
-#include "pca9685.h"
 #include "app.h"
 #include "UpperCP.h"
 /* USER CODE END Includes */
@@ -223,25 +218,10 @@ void StartTask02(void *argument)
   /* Infinite loop */
     
   for(;;)
-  { char uart_buf[64];
-
-    OLED_ShowString(40, 0, "        ", 16);
-    OLED_ShowFloat(40, 0, g_robot_pos.yaw, 6, 16);
-    OLED_ShowString(40, 2, "        ", 16);
-    OLED_ShowFloat(40, 2, TofData / 10.0f, 6, 16);
-    OLED_ShowString(24, 4, "        ", 16);
-    OLED_ShowFloat(24, 4, g_robot_pos.x, 6, 16);
-    OLED_ShowString(24, 6, "        ", 16);
-    OLED_ShowFloat(24, 6, g_robot_pos.y, 6, 16);
-
-    /* UART6 输出位置信息 */
-    int len = snprintf(uart_buf, sizeof(uart_buf),
-                       "X:%.2f Y:%.2f Yaw:%.2f S:%d K:%s \r\n",
-                       g_robot_pos.x/10, g_robot_pos.y/10, g_robot_pos.yaw,
-                       navigation_state, UpperCP_GetLastCommand());                     
-    HAL_UART_Transmit(&huart6, (uint8_t *)uart_buf, len, 100);
- osDelay(100);
- 
+  {
+    /* TODO: g_robot_pos (navigation.h), TofData (tof200f.h), navigation_state
+     * removed along with their modules. Re-enable display when replacements ready. */
+    osDelay(100);
   }
   /* USER CODE END StartTask02 */
 }
@@ -259,9 +239,9 @@ void StartTask03(void *argument)
   /* Infinite loop */
   for(;;)
   {
-     g_robot_pos.yaw = Get_zeroYaw();
-     Navigation_TaskTick();
-     Odometer_Update();
+     /* g_robot_pos.yaw = Get_zeroYaw(); -- navigation.c removed */
+     /* Navigation_TaskTick();           -- navigation.c removed */
+     /* Odometer_Update();               -- odometer.c removed */
      vTaskDelay(pdMS_TO_TICKS(10));
   }
   /* USER CODE END StartTask03 */
@@ -279,12 +259,13 @@ void StartTask04(void *argument)
   /* USER CODE BEGIN StartTask04 */
   /* Infinite loop */
   App_Init();
-//    PCA9685_Set180Angle(1U,80.0f);
-    PCA9685_Set270Angle(0.0f);
-        osDelay(1000);
-      PCA9685_Set270Angle(-80.0f);
+    /* PCA9685 module removed. Servo init calls commented out:
+    // PCA9685_Set180Angle(1U,80.0f);
+    // PCA9685_Set270Angle(0.0f);
+    // PCA9685_Set270Angle(-80.0f);
+    // PCA9685_Set270Angle(-100.0f);
+    */
     osDelay(1000);
-    PCA9685_Set270Angle(-100.0f);
   for(;;)
   {
         // UpperCP_RX();

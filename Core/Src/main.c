@@ -32,12 +32,7 @@
 #include "hwt101_hal.h"
 #include "oled.h"
 #include "bujin.h"
-#include "odometer.h"
-#include "tof200f.h"
-#include "navigation.h"
-#include "voice.h"
 #include "overroll.h"
-#include "pca9685.h"
 #include "app.h"
 /* USER CODE END Includes */
 
@@ -113,12 +108,9 @@ int main(void)
   MX_TIM8_Init();
   MX_USART6_UART_Init();
   MX_I2C2_Init();
+  Emm_V5_Pos_Control(5,0,10,NULL,100,true,false);
   /* USER CODE BEGIN 2 */
 
- if (PCA9685_Init() != 0)//舵机初始化
- {
-   Error_Handler();
- }
   // PCA9685_Set180Angle(1U, 0.0f);
   uint32_t hwt_wait_start;
   HWT101_HAL_Init();
@@ -127,9 +119,6 @@ int main(void)
   while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
   {
   }
-  Navigation_Reset(NAV_START_CENTER_X_MM, NAV_START_CENTER_Y_MM, g_hwt101_yaw);
-  Odometer_Init();
-  // TOF200F_Init();
   OLED_Init();
   /* USER CODE END 2 */
 

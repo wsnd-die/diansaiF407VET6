@@ -1,5 +1,4 @@
 #include "hwt101_hal.h"
-#include "navigation.h"
 /* 引用 main.c 中的 UART4 句柄 */
 extern UART_HandleTypeDef huart4;
 
@@ -104,7 +103,9 @@ int32_t HWT101_HAL_Init(void)
 
 float Get_zeroYaw(void)
 {
-    return Navigation_NormalizeDeg(g_hwt101_yaw - nav_yaw_zero_deg);
+    /* TODO: Navigation_NormalizeDeg() and nav_yaw_zero_deg removed with navigation.c.
+     * Replace with direct yaw reading or re-implement normalization. */
+    return g_hwt101_yaw;
 }
 
 int16_t HWT101_ReadReg(uint32_t reg)
