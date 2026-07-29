@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 extern uint8_t PosFlag;
+extern int16_t gangzhu_err;
 extern uint8_t fruits[8];
 extern uint8_t fruits_count;
 

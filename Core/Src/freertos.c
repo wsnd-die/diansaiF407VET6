@@ -216,12 +216,17 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
+  OLED_Clear();
+  OLED_ShowString(0, 0, "SYSTEM RUNNING", 16);
     
   for(;;)
   {
-    /* TODO: g_robot_pos (navigation.h), TofData (tof200f.h), navigation_state
-     * removed along with their modules. Re-enable display when replacements ready. */
-    osDelay(100);
+            OLED_ShowString(0, 2, "G_ERR:", 16);
+            OLED_ShowChar(48, 2, (gangzhu_err < 0) ? '-' : '+', 16);
+            OLED_ShowNum(56, 2,
+                         (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
+                         5, 16, 1);
+    osDelay(300);
   }
   /* USER CODE END StartTask02 */
 }
@@ -236,6 +241,16 @@ void StartTask02(void *argument)
 void StartTask03(void *argument)
 {
   /* USER CODE BEGIN StartTask03 */
+//   Emm_V5_Set_Zero(5,1);//这个上电运行一次后取消
+    // Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零 上电先归零才能保存上次的零点
+    // osDelay(1000);
+    // Emm_V5_Pos_Control(5,0,50,10,100,true,false);
+    // osDelay(1000);
+    // Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
+    //  osDelay(1000);
+    // Emm_V5_Pos_Control(5,0,50,10,200,true,false);
+    // osDelay(1000);
+    // Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
   /* Infinite loop */
   for(;;)
   {
@@ -260,15 +275,12 @@ void StartTask04(void *argument)
   /* Infinite loop */
   App_Init();
     /* PCA9685 module removed. Servo init calls commented out:
-    // PCA9685_Set180Angle(1U,80.0f);
-    // PCA9685_Set270Angle(0.0f);
-    // PCA9685_Set270Angle(-80.0f);
-    // PCA9685_Set270Angle(-100.0f);
+
     */
     osDelay(1000);
   for(;;)
   {
-        // UpperCP_RX();
+        UpperCP_RX();
         /* App chain: read current app mode and execute one scheduling step. */
         App_RunCurrentMode();
     osDelay(100);

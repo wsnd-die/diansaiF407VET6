@@ -1,8 +1,10 @@
 #include "UpperCP.h"
 #include "usart.h"
+#include "oled.h"
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define UPPERCP_RX_BUF_LEN 128U
@@ -16,6 +18,7 @@ static volatile uint8_t uppercp_last_byte;
 static char uppercp_cmd_buf[UPPERCP_RX_BUF_LEN];
 static char uppercp_last_cmd[UPPERCP_RX_BUF_LEN];
 static uint16_t uppercp_cmd_len;
+static uint8_t uppercp_receiving;
 
 static void Serial5_Printf(const char *fmt, ...)
 {
@@ -88,6 +91,7 @@ uint8_t UpperCP_GetLastByte(void)
 
 static char *ret = NULL;
 uint8_t PosFlag = 1;
+int16_t gangzhu_err = 0;
 uint8_t CameraFlag = 0;
 
 /* uint8_t fruits[8] = {3,5,7,1,6,10,12,9}; */
@@ -95,7 +99,7 @@ uint8_t fruits[8] = {4,3,1,10,8,9,2,11};
 /* uint8_t fruits[8] = {12,2,9,4,5,11,1,7}; */
 
 uint8_t fruits_count = 0;
-
+/* 包头为 %，包尾为 #，命令字段之间用逗号分隔。 */
 void UpperCP_RX(void)
 {
     uint8_t command_ready = 0U;
@@ -104,20 +108,36 @@ void UpperCP_RX(void)
         uint8_t ch = uppercp_rx_buf[uppercp_rx_tail];
         uppercp_rx_tail = (uint16_t)((uppercp_rx_tail + 1U) % UPPERCP_RX_BUF_LEN);
 
-        if (ch == ';' || ch == '\r' || ch == '\n') {
-            if (uppercp_cmd_len == 0U) {
-                continue;
-            }
-            uppercp_cmd_buf[uppercp_cmd_len] = '\0';
+        if (ch == '%') {
             uppercp_cmd_len = 0U;
-            command_ready = 1U;
-            break;
+            uppercp_receiving = 1U;
+            continue;
+        }
+
+        if (uppercp_receiving == 0U) {
+            continue;
+        }
+
+        if (ch == '#') {
+            if (uppercp_cmd_len != 0U) {
+                uppercp_cmd_buf[uppercp_cmd_len] = '\0';
+                command_ready = 1U;
+            }
+            uppercp_cmd_len = 0U;
+            uppercp_receiving = 0U;
+
+            if (command_ready != 0U) {
+                break;
+            }
+
+            continue;
         }
 
         if (uppercp_cmd_len < (UPPERCP_RX_BUF_LEN - 1U)) {
             uppercp_cmd_buf[uppercp_cmd_len++] = (char)ch;
         } else {
             uppercp_cmd_len = 0U;
+            uppercp_receiving = 0U;
         }
     }
 
@@ -125,19 +145,15 @@ void UpperCP_RX(void)
         return;
     }
 
-    ret = strtok(uppercp_cmd_buf, ":");
-    if (ret != NULL) {
-        strncpy(uppercp_last_cmd, ret, sizeof(uppercp_last_cmd) - 1U);
-        uppercp_last_cmd[sizeof(uppercp_last_cmd) - 1U] = '\0';
-        cmd_func();
-        speed_func();
-        angle_func();
-        face_func();
-        voice_func();
-        Arm_func();
-        ErWeiMa_func();
-        Move_func();
-        ret = NULL;
+    {
+        char *end;
+        long value = strtol(uppercp_cmd_buf, &end, 10);
+
+        if ((end != uppercp_cmd_buf) && (*end == '\0') &&
+            (value >= -32768L) && (value <= 32767L)) {
+            gangzhu_err = (int16_t)value;
+
+        }
     }
 }
 

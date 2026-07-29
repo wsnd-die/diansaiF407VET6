@@ -83,7 +83,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -108,20 +108,21 @@ int main(void)
   MX_TIM8_Init();
   MX_USART6_UART_Init();
   MX_I2C2_Init();
-  Emm_V5_Pos_Control(5,0,10,NULL,100,true,false);
+
   /* USER CODE BEGIN 2 */
 
   // PCA9685_Set180Angle(1U, 0.0f);
-  uint32_t hwt_wait_start;
-  HWT101_HAL_Init();
-  g_hwt101_data_ready = 0;
-  hwt_wait_start = HAL_GetTick();
-  while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
-  {
-  }
+  // uint32_t hwt_wait_start;
+  // HWT101_HAL_Init();
+  // g_hwt101_data_ready = 0;
+  // hwt_wait_start = HAL_GetTick();
+  // while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
+  // {
+  // }
   OLED_Init();
   /* USER CODE END 2 */
 
+  
   /* Init scheduler */
   osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
   MX_FREERTOS_Init();
