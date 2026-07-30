@@ -47,7 +47,6 @@ typedef struct {
 void Emm_V5_En_Control(uint8_t addr, bool state, bool snF);
 void Emm_V5_Stop_Now(uint8_t addr, bool snF);
 void Emm_V5_Vel_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, bool snF);
-void Emm_V5_Pos_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, float mm, bool raF, bool snF);
 void Emm_V5_Modify_Ctrl_Mode(uint8_t addr, bool svF, uint8_t ctrl_mode);
 void Emm_V5_Reset_Clog_Pro(uint8_t addr);
 void Emm_V5_Set_Zero(uint8_t addr, bool save);

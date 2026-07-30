@@ -33,10 +33,6 @@ extern volatile AppMode_t g_app_mode;
  */
 void App_Init(void);
 
-/**
- * @brief 运行当前应用模式下的任务逻辑，根据当前模式依次执行航线
- */
-void App_RunCurrentMode(void);
 
 /**
  * @brief 设置应用程序的目标运行模式

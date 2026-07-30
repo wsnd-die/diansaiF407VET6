@@ -17,25 +17,19 @@ static float GangzhuPid_Clamp(float value, float min_value, float max_value)
     return value;
 }
 
-void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd,
-                     float period_s, float max_step_mm,
-                     float min_position_mm, float max_position_mm)
+void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
 {
     const fp32 pid_params[3] = { kp, ki, kd };
 
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
-    pid->period_s = period_s;
-    pid->max_step_mm = max_step_mm;
-    pid->min_position_mm = min_position_mm;
-    pid->max_position_mm = max_position_mm;
     pid->position_mm = 0.0f;
     pid->previous_error = 0.0f;
     pid->previous_previous_error = 0.0f;
     pid->output = 0.0f;
     pid->initialized = 0U;
-    PID_init(&pid->q_pid, PID_DELTA, pid_params, 80, 10);
+    PID_init(&pid->q_pid, PID_DELTA, pid_params, 140, 10);
 }
 
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
@@ -67,9 +61,9 @@ void Gangzhu_Control_Update(void)
       output_gangzhu  = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
      step_mm=-GangzhuPid_Clamp(output_gangzhu,-100,100);
     if (step_mm > 0.0f) {
-        Emm_V5_Pos_Control(5, 0, 150, 220, step_mm, 1, false);
+        Emm_V5_Pos_Control_ByPulse(5, 0, 150, 220, step_mm, 1, false);
     } else if (step_mm < 0.0f) {
-        Emm_V5_Pos_Control(5, 1, 150, 220, -step_mm, 1, false);
+        Emm_V5_Pos_Control_ByPulse(5, 1, 150, 220, -step_mm, 1, false);
     }
 }
  float output_gangzhu;

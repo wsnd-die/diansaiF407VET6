@@ -180,20 +180,6 @@ void Emm_V5_Vel_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, bo
    osDelay(5);
 }
 
-/**
- * @brief  位置模式控制
- * @param  addr 电机地址
- * @param  dir  方向，0 为 CW，1 为 CCW
- * @param  vel  速度，单位 RPM
- * @param  acc  加速度，0 表示直接启动
- * @param  mm   移动距离，单位 mm；函数内部换算成脉冲数
- * @param  raF  false 相对运动，true 绝对位置运动
- * @param  snF  多机同步标志，true 时需再发送 Emm_V5_Synchronous_motion()
- */
-void Emm_V5_Pos_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, float mm, bool raF, bool snF)
-{
-   Emm_V5_Pos_Control_ByPulse(addr, dir, vel, acc, Emm_MmToPulse(mm), raF, snF);
-}
 
 /**
  * @brief  修改驱动器控制模式

@@ -251,7 +251,7 @@ void StartTask03(void *argument)
   {
      /* g_robot_pos.yaw = Get_zeroYaw(); -- navigation.c removed */
         
-    App_RunCurrentMode();
+
     App_ProcessCommand();
      vTaskDelay(pdMS_TO_TICKS(100));
   }
@@ -282,7 +282,7 @@ void StartTask04(void *argument)
             gangzhu_err_updated = 0U;
            Gangzhu_Control_Update();
         }
-    osDelay(100);
+    osDelay(10);
   }
   /* USER CODE END StartTask04 */
 }
