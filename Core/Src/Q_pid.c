@@ -3,6 +3,7 @@
  * @brief   通用 PID — 位置式 / 增量式 / 积分分离增量式
 */
 #include "Q_pid.h"
+#include <math.h>
 
 #define LIMIT_MAX(input, max)   \
     do {                        \

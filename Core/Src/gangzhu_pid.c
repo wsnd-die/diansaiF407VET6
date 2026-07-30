@@ -1,4 +1,5 @@
 #include "gangzhu_pid.h"
+#include "Q_pid.h"
 #include "UpperCP.h"
 #include "bujin.h"
 #include <stdbool.h>
@@ -20,6 +21,8 @@ void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd,
                      float period_s, float max_step_mm,
                      float min_position_mm, float max_position_mm)
 {
+    const fp32 pid_params[3] = { kp, ki, kd };
+
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
@@ -32,6 +35,7 @@ void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd,
     pid->previous_previous_error = 0.0f;
     pid->output = 0.0f;
     pid->initialized = 0U;
+    PID_init(&pid->q_pid, PID_DELTA, pid_params, max_step_mm, max_step_mm);
 }
 
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
@@ -43,6 +47,10 @@ void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
     pid->previous_previous_error = 0.0f;
     pid->output = 0.0f;
     pid->initialized = 0U;
+    pid->q_pid.Kp = pid->kp;
+    pid->q_pid.Ki = pid->ki;
+    pid->q_pid.Kd = pid->kd;
+    PID_clear(&pid->q_pid);
 }
 
 void GangzhuPid_AdjustGains(GangzhuPid_t *pid, float kp_delta,
@@ -67,22 +75,14 @@ void Gangzhu_Control_Update(void)
 float GangzhuPid_Update(GangzhuPid_t *pid, short error)
 {
     float error_f = (float)error;
-    float output_increment;
     float output;
-    float step;
-    float target_position;
 
-    if (pid->initialized != 0U) {
-        output_increment = pid->kp * (error_f - pid->previous_error) +
-                           pid->ki * pid->period_s * error_f +
-                           pid->kd * (error_f - 2.0f * pid->previous_error +
-                                      pid->previous_previous_error) / pid->period_s;
-        output = pid->output + output_increment;
-    } else {
-        output = pid->kp * error_f + pid->ki * pid->period_s * error_f;
-    }
+    output = PID_calc(&pid->q_pid, 0.0f, error_f);
+    pid->previous_error = pid->q_pid.error[1];
+    pid->previous_previous_error = pid->q_pid.error[2];
+    pid->output = output;
+    pid->initialized = 1U;
 
-   
     return output;
     
 }

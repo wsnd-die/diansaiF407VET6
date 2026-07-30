@@ -1,7 +1,10 @@
 #ifndef GANGZHU_PID_H
 #define GANGZHU_PID_H
 
+#include "Q_pid.h"
+
 typedef struct {
+    pid_type_def q_pid;      /* 通用增量式 PID 控制器 */
     float kp;                /* 比例系数 */
     float ki;                /* 积分系数 */
     float kd;                /* 微分系数 */

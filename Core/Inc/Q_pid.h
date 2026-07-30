@@ -6,7 +6,7 @@
  * @brief   通用 PID 控制器 — 位置式 / 增量式 / 积分分离增量式
  */
  
-#include "ti_msp_dl_config.h"
+#include <stdint.h>
 
 typedef float fp32;
 
