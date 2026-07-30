@@ -4,7 +4,8 @@
 #include "Q_pid.h"
 
 typedef struct {
-    pid_type_def q_pid;      /* 通用增量式 PID 控制器 */
+    pid_type_def q_pid;      /* 距离外环 PID 控制器 */
+    pid_type_def speed_pid;  /* 速度内环 PID 控制器 */
     float kp;                /* 比例系数 */
     float ki;                /* 积分系数 */
     float kd;                /* 微分系数 */
@@ -12,6 +13,7 @@ typedef struct {
     float previous_error;    /* 上次误差 */
     float previous_previous_error; /* 上上次误差 */
     float output;            /* 上次 PID 输出 */
+    float target_speed;      /* 距离外环给出的目标速度 */
     unsigned char initialized;
 } GangzhuPid_t;
 extern GangzhuPid_t s_gangzhu_pid;
