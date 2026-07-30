@@ -248,7 +248,7 @@ void StartTask03(void *argument)
 {
   /* USER CODE BEGIN StartTask03 */
   // Emm_V5_Set_Zero(5,1);//这个上电运行一次后取消
-    Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零 上电先归零才能保存上次的零点
+    // 单圈就近回零 上电先归零才能保存上次的零点
     // osDelay(1000);
 
     //  osDelay(1000);
@@ -279,8 +279,9 @@ void StartTask04(void *argument)
   /* Infinite loop */
   App_Init();
     /* PCA9685 module removed. Servo init calls commented out:
-
+     
     */
+//   Emm_V5_Pos_Control(5, 0, 50, 10, 40.0f, false, false);
     osDelay(1000);
   for(;;)
   {

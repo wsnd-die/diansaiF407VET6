@@ -110,15 +110,8 @@ int main(void)
   MX_I2C2_Init();
 
   /* USER CODE BEGIN 2 */
-
-  // PCA9685_Set180Angle(1U, 0.0f);
-  // uint32_t hwt_wait_start;
-  // HWT101_HAL_Init();
-  // g_hwt101_data_ready = 0;
-  // hwt_wait_start = HAL_GetTick();
-  // while (g_hwt101_data_ready == 0 && (HAL_GetTick() - hwt_wait_start) < 1000)
-  // {
-  // }
+   Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
+ 
   OLED_Init();
   /* USER CODE END 2 */
 
