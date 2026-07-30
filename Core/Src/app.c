@@ -118,9 +118,9 @@ void App_RunCurrentMode(void)
         taskEXIT_CRITICAL();
 
         if (lift_cmd == 'a') {
-            Emm_V5_Pos_Control(5, 0, 50, 10, 10.0f, false, false);
+            Emm_V5_Pos_Control(5, 0, 50, 10, 5.0f, false, false);
         } else if (lift_cmd == 's') {
-            Emm_V5_Pos_Control(5, 1, 50, 10, 10.0f, false, false);
+            Emm_V5_Pos_Control(5, 1, 50, 10, 5.0f, false, false);
         } else if (lift_cmd == 't') {
             Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
         }
