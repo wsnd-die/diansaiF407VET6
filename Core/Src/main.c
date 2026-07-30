@@ -33,6 +33,7 @@
 #include "oled.h"
 #include "bujin.h"
 #include "overroll.h"
+#include "gangzhu_pid.h"
 #include "app.h"
 /* USER CODE END Includes */
 
@@ -112,7 +113,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 //  Emm_V5_Set_Zero(5,1);
    Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
- 
+   HAL_Delay(1000);
+   GangzhuPid_Init(&s_gangzhu_pid, 0.05f, 0.0f, 5.0f,
+                  GANGZHU_PID_PERIOD_S, GANGZHU_PID_MAX_STEP_MM,
+                  GANGZHU_POSITION_MIN_MM, GANGZHU_POSITION_MAX_MM);
   OLED_Init();
   /* USER CODE END 2 */
 

@@ -55,6 +55,8 @@ bool App_IsRunning(void);
  * @param data 接收到的串口数据字节 ('a'/'A' 启动, 't'/'T' 停止)
  */
 void App_CommandUartRxByte(uint8_t data);
+void App_ProcessCommand(void);
+void App_Uart6Printf(const char *fmt, ...);
 
 /**
  * @brief  C区环形拓扑多目标点最短路径规划与导航执行函数

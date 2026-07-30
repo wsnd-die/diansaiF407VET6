@@ -5,9 +5,11 @@
 
 extern uint8_t PosFlag;
 extern int16_t gangzhu_err;
+extern volatile uint8_t gangzhu_err_updated;
 extern uint8_t fruits[8];
 extern uint8_t fruits_count;
-
+extern int16_t gangzhu_distance;
+extern int16_t gangzhu_speed;
 extern uint8_t CameraFlag;
 
 void UpperCP_RX(void);

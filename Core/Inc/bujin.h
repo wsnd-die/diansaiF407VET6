@@ -58,5 +58,5 @@ void Emm_V5_Read_Zero_Status(uint8_t addr);
 void Emm_V5_Synchronous_motion(uint8_t addr);
 void Emm_V5_Read_Sys_Params(uint8_t addr, SysParams_t s);
 void motor_to_angle_control(uint8_t addr, float angle, uint16_t vel, uint8_t acc);
-
+void Emm_V5_Pos_Control_ByPulse(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, uint32_t pulse, bool raF, bool snF);
 #endif

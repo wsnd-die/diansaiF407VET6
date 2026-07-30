@@ -32,7 +32,6 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true
             },
-            "compilerPath": "D:/keil5/ARM/ARMCC/bin/armcc.exe",
             "cStandard": "c99",
             "cppStandard": "c++11",
             "intelliSenseMode": "arm-gcc"

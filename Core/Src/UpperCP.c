@@ -3,6 +3,7 @@
 #include "oled.h"
 
 #include <stdarg.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,7 @@ static char uppercp_cmd_buf[UPPERCP_RX_BUF_LEN];
 static char uppercp_last_cmd[UPPERCP_RX_BUF_LEN];
 static uint16_t uppercp_cmd_len;
 static uint8_t uppercp_receiving;
+int16_t gangzhu_speed = 0;
 
 static void Serial5_Printf(const char *fmt, ...)
 {
@@ -92,6 +94,7 @@ uint8_t UpperCP_GetLastByte(void)
 static char *ret = NULL;
 uint8_t PosFlag = 1;
 int16_t gangzhu_err = 0;
+volatile uint8_t gangzhu_err_updated = 0U;
 uint8_t CameraFlag = 0;
 
 /* uint8_t fruits[8] = {3,5,7,1,6,10,12,9}; */
@@ -99,7 +102,7 @@ uint8_t fruits[8] = {4,3,1,10,8,9,2,11};
 /* uint8_t fruits[8] = {12,2,9,4,5,11,1,7}; */
 
 uint8_t fruits_count = 0;
-/* 包头为 %，包尾为 #，命令字段之间用逗号分隔。 */
+/* 包头为 %，包尾为 #，数据格式为“距离速度”，例如 %+25-35#。 */
 void UpperCP_RX(void)
 {
     uint8_t command_ready = 0U;
@@ -146,16 +149,22 @@ void UpperCP_RX(void)
     }
 
     {
-        char *end;
-        long value = strtol(uppercp_cmd_buf, &end, 10);
-      
-        
+        char *distance_end;
+        char *speed_end;
+        long distance = strtol(uppercp_cmd_buf, &distance_end, 10);
+        long speed = strtol(distance_end, &speed_end, 10);
 
-        if ((end != uppercp_cmd_buf) && (*end == '\0') &&
-            (value >= -32768L) && (value <= 32767L)) {
-            gangzhu_err = (int16_t)value;
-         
-
+        if ((distance_end == uppercp_cmd_buf) ||
+            (speed_end == distance_end) ||
+            (*speed_end != '\0') ||
+            (distance < INT16_MIN) || (distance > INT16_MAX) ||
+            (speed < INT16_MIN) || (speed > INT16_MAX)) {
+            return;
+        }
+        else{
+        gangzhu_err = (int16_t)distance;
+        gangzhu_speed = (int16_t)speed;
+        gangzhu_err_updated=1;
         }
     }
 }

@@ -34,6 +34,8 @@
 #include "overroll.h"
 #include "app.h"
 #include "UpperCP.h"
+#include "gangzhu_pid.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +55,10 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+
+
+
+
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -112,6 +118,7 @@ const osMutexAttr_t usart2TX_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+
 
 /* USER CODE END FunctionPrototypes */
 
@@ -186,6 +193,7 @@ void MX_FREERTOS_Init(void) {
 
 }
 
+
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
   * @brief  Function implementing the defaultTask thread.
@@ -226,12 +234,11 @@ void StartTask02(void *argument)
             OLED_ShowNum(56, 2,
                          (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
                          5, 16, 1);
-                         int tx_len;
-                          char tx_buf[9];
-            tx_len = snprintf(tx_buf, sizeof(tx_buf), "%d\r\n", (int)gangzhu_err);
-            if ((tx_len > 0) && ((uint32_t)tx_len < sizeof(tx_buf))) {
-                (void)HAL_UART_Transmit(&huart6, (uint8_t *)tx_buf, (uint16_t)tx_len, 100U);
-            }
+            char output[64];
+            snprintf(output, sizeof(output), "out:err=%d,out=%.2f\r\n",
+                     (int)gangzhu_err, (double)step_mm,
+                     (double)s_gangzhu_pid.position_mm);
+            App_Uart6Printf("%s", output);
     osDelay(300);
   }
   /* USER CODE END StartTask02 */
@@ -247,21 +254,14 @@ void StartTask02(void *argument)
 void StartTask03(void *argument)
 {
   /* USER CODE BEGIN StartTask03 */
-  // Emm_V5_Set_Zero(5,1);//这个上电运行一次后取消
-    // 单圈就近回零 上电先归零才能保存上次的零点
-    // osDelay(1000);
 
-    //  osDelay(1000);
-    // Emm_V5_Pos_Control(5,0,50,10,200,true,false);
-    // osDelay(1000);
-    // Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
   /* Infinite loop */
   for(;;)
   {
      /* g_robot_pos.yaw = Get_zeroYaw(); -- navigation.c removed */
-     /* Navigation_TaskTick();           -- navigation.c removed */
-     /* Odometer_Update();               -- odometer.c removed */
-     vTaskDelay(pdMS_TO_TICKS(10));
+    App_RunCurrentMode();
+    App_ProcessCommand();
+     vTaskDelay(pdMS_TO_TICKS(100));
   }
   /* USER CODE END StartTask03 */
 }
@@ -276,19 +276,21 @@ void StartTask03(void *argument)
 void StartTask04(void *argument)
 {
   /* USER CODE BEGIN StartTask04 */
+
   /* Infinite loop */
   App_Init();
     /* PCA9685 module removed. Servo init calls commented out:
      
     */
 //   Emm_V5_Pos_Control(5, 0, 50, 10, 40.0f, false, false);
-    osDelay(1000);
   for(;;)
   {
         UpperCP_RX();
-        /* App chain: read current app mode and execute one scheduling step. */
-        App_RunCurrentMode();
-    osDelay(100);
+        if (gangzhu_err_updated != 0U) {
+            gangzhu_err_updated = 0U;
+            Gangzhu_Control_Update();
+        }
+    osDelay(10);
   }
   /* USER CODE END StartTask04 */
 }

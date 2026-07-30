@@ -46,7 +46,7 @@ static uint32_t Emm_MmToPulse(float mm)
    return (uint32_t)(pulse + 0.5f);
 }
 
-static void Emm_V5_Pos_Control_ByPulse(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, uint32_t pulse, bool raF, bool snF)
+ void Emm_V5_Pos_Control_ByPulse(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, uint32_t pulse, bool raF, bool snF)
 {
    /* 帧格式：地址 + 0xFD + 方向 + 速度 + 加速度 + 4 字节脉冲数 + 相对/绝对 + 同步 + 0x6B */
    uint8_t cmd[13] = {
@@ -66,7 +66,7 @@ static void Emm_V5_Pos_Control_ByPulse(uint8_t addr, uint8_t dir, uint16_t vel, 
    };
 
    Emm_Send(cmd, sizeof(cmd));
-   HAL_Delay(5);
+   osDelay(1);   /* 921600bps 下 13B 传输仅需 ~141us，但给驱动器 5ms 处理时间 */
 }
 
 /**
@@ -117,7 +117,7 @@ void Emm_V5_Vel_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, bo
    };
 
    Emm_Send(cmd, sizeof(cmd));
-   HAL_Delay(1);
+   osDelay(5);
 }
 
 /**
@@ -254,7 +254,7 @@ void Emm_V5_Synchronous_motion(uint8_t addr)
    /* 先用 snF=true 下发动作，再用本函数发送同步触发命令。 */
    uint8_t cmd[4] = {addr, 0xFF, 0x66, 0x6B};
    Emm_Send(cmd, sizeof(cmd));
-   HAL_Delay(1);
+    osDelay(5);
 }
 
 /**

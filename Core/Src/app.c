@@ -3,6 +3,9 @@
 #include "task.h"
 #include "usart.h"
 #include "bujin.h"
+#include "gangzhu_pid.h"
+#include <stdarg.h>
+#include <stdio.h>
 /* 定义 PI 常量，避免未定义标识符 */
 #ifndef PI
 #define PI 3.14159265358979323846f
@@ -21,7 +24,7 @@ volatile AppMode_t g_app_mode = APP_MODE_IDLE;
 /* 内部状态变量：路径导航是否运行中，是否收到停止请求 */
 static volatile bool s_app_running;
 static volatile bool s_stop_requested;
-static volatile uint8_t s_lift_cmd;
+static volatile uint8_t s_data;
 
 /* 航线 A 的目标路径点序列 */
 static const AppWaypoint_t k_route_a[] = {
@@ -61,7 +64,7 @@ void App_Init(void)
     g_app_mode = APP_MODE_IDLE;
     s_app_running = false;
     s_stop_requested = false;
-    s_lift_cmd = 0U;
+    s_data = 0U;
 }
 
 /**
@@ -81,57 +84,86 @@ bool App_IsRunning(void)
 }
 
 /**
- * @brief 接收串口命令，中断里只记录命令，电机动作在任务里执行
- * @param data 接收到的字符。'a'/'A' 上升，'s'/'S' 下降，'t'/'T' 回零
+ * @brief USART6 统一格式化输出，所有蓝牙串口发送都走这一个出口
+ * @param fmt  printf 格式字符串
+ * @param ...  可变参数
+ */
+void App_Uart6Printf(const char *fmt, ...)
+{
+    char tx_buf[128];
+    va_list args;
+    int tx_len;
+
+    va_start(args, fmt);
+    tx_len = vsnprintf(tx_buf, sizeof(tx_buf), fmt, args);
+    va_end(args);
+
+    if ((tx_len > 0) && ((uint32_t)tx_len < sizeof(tx_buf))) {
+        (void)HAL_UART_Transmit(&huart6, (uint8_t *)tx_buf, (uint16_t)tx_len, 100U);
+    }
+}
+
+/**
+ * @brief 接收串口命令，中断里只存入标志位，不做任何耗时操作
  */
 void App_CommandUartRxByte(uint8_t data)
 {
-    if (data == 'a' || data == 'A') {
-        s_lift_cmd = 'a';
-    } else if (data == 't' || data == 'T') {
-        s_lift_cmd = 't';
-    } else if (data == 's' || data == 'S') {
-        s_lift_cmd = 's';
-    }
+    s_data = data;
 }
-static long PC_Comm_FloatToCenti(float value)
+
+/**
+ * @brief 处理蓝牙串口命令（在任务上下文中调用，不可在中断里调用）
+ *        读取 s_data 标志位，执行对应的电机控制或 PID 调节，
+ *        处理完后将 s_data 清零。
+ */
+void App_ProcessCommand(void)
 {
-    if (value >= 0.0f) {
-        return (long)(value * 100.0f + 0.5f);
+    uint8_t data;
+
+    data = s_data;
+    if (data == 0U) {
+        return;
     }
+    s_data = 0U;
 
-    return (long)(value * 100.0f - 0.5f);
+    if (data == 'a' || data == 'A') {
+         Emm_V5_Pos_Control_ByPulse(5, 1, 50, 0, 100.0f, 1, false);
+    } else if (data == 's' || data == 'S') {
+          Emm_V5_Pos_Control_ByPulse(5, 0, 50, 0, 100.0f, 1, false);
+    } else if (data == 't' || data == 'T') {
+        Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
+    } else if (data == 'P') {
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.05f, 0.0f, 0.0f);
+        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    } else if (data == 'p') {
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, -0.05f, 0.0f, 0.0f);
+        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    } else if (data == 'I') {
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.01f, 0.0f);
+        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    } else if (data == 'i') {
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, -0.01f, 0.0f);
+        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    } else if (data == 'D') {
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, 0.01f);
+        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    } else if (data == 'd') {
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, -0.01f);
+        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    }
 }
-
 
 /**
  * @brief 应用主循环/任务中调用的模式执行函数
- *        根据当前所处的 g_app_mode 决定执行哪条航线，或处理停止请求
  */
 void App_RunCurrentMode(void)
 {
-        uint8_t lift_cmd;
-
-        taskENTER_CRITICAL();
-        lift_cmd = s_lift_cmd;
-        s_lift_cmd = 0U;
-        taskEXIT_CRITICAL();
-
-        if (lift_cmd == 'a') {
-            Emm_V5_Pos_Control(5, 0, 50, 10, 5.0f, false, false);
-        } else if (lift_cmd == 's') {
-            Emm_V5_Pos_Control(5, 1, 50, 10, 5.0f, false, false);
-        } else if (lift_cmd == 't') {
-            Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
-        }
-
-        if (s_stop_requested) {
-            s_stop_requested = false;
-            /* Navigation_Stop(); -- navigation.c removed */
-            return;
-        }
-
-  
      switch (g_app_mode) {
         case APP_MODE_TEST:
             /* Test mode: currently does nothing, but can be used for debugging or custom tests. */
@@ -145,7 +177,7 @@ void App_RunCurrentMode(void)
 
         case APP_MODE_IDLE:
             /* Idle mode: ensure the robot is stopped and not executing any navigation tasks. */
-           
+
             break;
 
         case APP_MODE_ROUTE_A:
@@ -193,7 +225,7 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
 /**
  * @brief  C区环形拓扑多目标点最短路径规划与导航执行函数
  * @details C区 12 个节点的环形轨道拓扑结构示意图：
- * 
+ *
  *               (y = 2450)
  *      [6] <------------------ [5]
  *       |                       |
@@ -208,7 +240,7 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
  *      [11] -----------------> [0]
  *               (y = 0)
  *   (x = -2700)             (x = -1900)
- * 
+ *
  *          算法原理：
  *          1. C区拥有 12 个离散顶点 (0~11)，闭合成一个矩形环形轨道赛道。
  *          2. 传入起点 node 编号与待访问目标点列表 `target_nodes`。
@@ -217,7 +249,7 @@ static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
  *          5. 沿途生成航点队列，目标节点置 `has_action = true`（到点停稳后触发舵机作业），
  *             过路节点置 `has_action = false`（只经过不停留/不动舵机）。
  *          6. 调用 `App_RunRoute` 驱动小车高效完成多目标任务。
- * 
+ *
  * @param  start_node_idx 起始节点编号 (0 ~ 11)
  * @param  target_nodes   待访问的目标节点编号数组
  * @param  num_targets    目标节点数量
@@ -326,4 +358,3 @@ int32_t App_RouteC_PlanAndRun(uint8_t start_node_idx, const uint8_t *target_node
 
     return 0;
 }
-
