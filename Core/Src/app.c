@@ -21,6 +21,7 @@ volatile AppMode_t g_app_mode = APP_MODE_IDLE;
 /* 内部状态变量：路径导航是否运行中，是否收到停止请求 */
 static volatile bool s_app_running;
 static volatile bool s_stop_requested;
+static volatile uint8_t s_lift_cmd;
 
 /* 航线 A 的目标路径点序列 */
 static const AppWaypoint_t k_route_a[] = {
@@ -60,6 +61,7 @@ void App_Init(void)
     g_app_mode = APP_MODE_IDLE;
     s_app_running = false;
     s_stop_requested = false;
+    s_lift_cmd = 0U;
 }
 
 /**
@@ -79,24 +81,17 @@ bool App_IsRunning(void)
 }
 
 /**
- * @brief 接收串口命令，用于启动或停止导航任务
- * @param data 接收到的字符。'a'/'A' 代表启动航线 A，'t'/'T' 代表立即紧急停机
+ * @brief 接收串口命令，中断里只记录命令，电机动作在任务里执行
+ * @param data 接收到的字符。'a'/'A' 上升，'s'/'S' 下降，'t'/'T' 回零
  */
 void App_CommandUartRxByte(uint8_t data)
 {
     if (data == 'a' || data == 'A') {
-        s_app_running = true;
-        s_stop_requested = false;
-        App_SetMode(APP_MODE_ROUTE_A);
+        s_lift_cmd = 'a';
     } else if (data == 't' || data == 'T') {
-        s_app_running = false;
-        s_stop_requested = true;
-        App_SetMode(APP_MODE_IDLE);
-    }
-    else if (data == 's' || data == 'S') {
-        s_app_running = 1;
-        s_stop_requested = 0;
-        App_SetMode(APP_MODE_TEST);
+        s_lift_cmd = 't';
+    } else if (data == 's' || data == 'S') {
+        s_lift_cmd = 's';
     }
 }
 static long PC_Comm_FloatToCenti(float value)
@@ -115,6 +110,21 @@ static long PC_Comm_FloatToCenti(float value)
  */
 void App_RunCurrentMode(void)
 {
+        uint8_t lift_cmd;
+
+        taskENTER_CRITICAL();
+        lift_cmd = s_lift_cmd;
+        s_lift_cmd = 0U;
+        taskEXIT_CRITICAL();
+
+        if (lift_cmd == 'a') {
+            Emm_V5_Pos_Control(5, 0, 50, 10, 10.0f, false, false);
+        } else if (lift_cmd == 's') {
+            Emm_V5_Pos_Control(5, 1, 50, 10, 10.0f, false, false);
+        } else if (lift_cmd == 't') {
+            Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
+        }
+
         if (s_stop_requested) {
             s_stop_requested = false;
             /* Navigation_Stop(); -- navigation.c removed */

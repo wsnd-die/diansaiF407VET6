@@ -148,10 +148,13 @@ void UpperCP_RX(void)
     {
         char *end;
         long value = strtol(uppercp_cmd_buf, &end, 10);
+      
+        
 
         if ((end != uppercp_cmd_buf) && (*end == '\0') &&
             (value >= -32768L) && (value <= 32767L)) {
             gangzhu_err = (int16_t)value;
+         
 
         }
     }

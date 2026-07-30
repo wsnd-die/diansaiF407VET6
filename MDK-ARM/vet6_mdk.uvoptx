@@ -185,6 +185,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>g_robot_pos.yaw</ItemText>
         </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>gangzhu_err</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

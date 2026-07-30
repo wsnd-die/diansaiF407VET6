@@ -226,6 +226,12 @@ void StartTask02(void *argument)
             OLED_ShowNum(56, 2,
                          (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
                          5, 16, 1);
+                         int tx_len;
+                          char tx_buf[9];
+            tx_len = snprintf(tx_buf, sizeof(tx_buf), "%d\r\n", (int)gangzhu_err);
+            if ((tx_len > 0) && ((uint32_t)tx_len < sizeof(tx_buf))) {
+                (void)HAL_UART_Transmit(&huart6, (uint8_t *)tx_buf, (uint16_t)tx_len, 100U);
+            }
     osDelay(300);
   }
   /* USER CODE END StartTask02 */
@@ -241,12 +247,10 @@ void StartTask02(void *argument)
 void StartTask03(void *argument)
 {
   /* USER CODE BEGIN StartTask03 */
-//   Emm_V5_Set_Zero(5,1);//这个上电运行一次后取消
-    // Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零 上电先归零才能保存上次的零点
+  // Emm_V5_Set_Zero(5,1);//这个上电运行一次后取消
+    Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零 上电先归零才能保存上次的零点
     // osDelay(1000);
-    // Emm_V5_Pos_Control(5,0,50,10,100,true,false);
-    // osDelay(1000);
-    // Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false); // 单圈就近回零
+
     //  osDelay(1000);
     // Emm_V5_Pos_Control(5,0,50,10,200,true,false);
     // osDelay(1000);
