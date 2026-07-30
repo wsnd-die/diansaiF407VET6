@@ -20,7 +20,7 @@ static float GangzhuPid_Clamp(float value, float min_value, float max_value)
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
 {
     const fp32 pid_params[3] = { kp, ki, kd };
-    const fp32 speed_pid_params[3] = { 1.0f, 0.0f, 0.0f };
+    const fp32 speed_pid_params[3] = { 0.4f, 0.0f, 0.0f };
 
     pid->kp = kp;
     pid->ki = ki;
@@ -72,7 +72,7 @@ void Gangzhu_Control_Update(void)
 
     s_gangzhu_pid.target_speed = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
     output_gangzhu = PID_calc(&s_gangzhu_pid.speed_pid,
-                              (float)gangzhu_speed,
+                              -(float)gangzhu_speed,
                               s_gangzhu_pid.target_speed);
     s_gangzhu_pid.output = output_gangzhu;
      step_mm=-GangzhuPid_Clamp(output_gangzhu,-100,100);
