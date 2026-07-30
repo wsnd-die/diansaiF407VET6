@@ -226,9 +226,8 @@ void StartTask02(void *argument)
                          (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
                          5, 16, 1);
             char output[64];
-            snprintf(output, sizeof(output), "out:err=%d,out=%.2f\r\n",
-                     (int)gangzhu_err, (double)step_mm,
-                     (double)s_gangzhu_pid.position_mm);
+            snprintf(output, sizeof(output), "out:err=%d,speed=%.2f\r\n",
+                     (int)gangzhu_err, (double)gangzhu_speed);
             App_Uart6Printf("%s", output);
     osDelay(100);
   }
@@ -282,7 +281,7 @@ void StartTask04(void *argument)
             gangzhu_err_updated = 0U;
            Gangzhu_Control_Update();
         }
-    osDelay(10);
+    osDelay(1);
   }
   /* USER CODE END StartTask04 */
 }

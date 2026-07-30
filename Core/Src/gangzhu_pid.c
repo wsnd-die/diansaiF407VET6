@@ -20,7 +20,7 @@ static float GangzhuPid_Clamp(float value, float min_value, float max_value)
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
 {
     const fp32 pid_params[3] = { kp, ki, kd };
-    const fp32 speed_pid_params[3] = { 0.4f, 0.0f, 0.0f };
+    const fp32 speed_pid_params[3] = { 0.48f, 0.002f, 0.002f };
 
     pid->kp = kp;
     pid->ki = ki;
