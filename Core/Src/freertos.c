@@ -96,20 +96,6 @@ const osThreadAttr_t myTask05_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal7,
 };
-/* Definitions for myTask06 */
-osThreadId_t myTask06Handle;
-const osThreadAttr_t myTask06_attributes = {
-  .name = "myTask06",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for myTask07 */
-osThreadId_t myTask07Handle;
-const osThreadAttr_t myTask07_attributes = {
-  .name = "myTask07",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -122,8 +108,6 @@ void StartTask02(void *argument);
 void StartTask03(void *argument);
 void StartTask04(void *argument);
 void StartTask05(void *argument);
-void StartTask06(void *argument);
-void StartTask07(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -168,12 +152,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of myTask05 */
   myTask05Handle = osThreadNew(StartTask05, NULL, &myTask05_attributes);
-
-  /* creation of myTask06 */
-  myTask06Handle = osThreadNew(StartTask06, NULL, &myTask06_attributes);
-
-  /* creation of myTask07 */
-  myTask07Handle = osThreadNew(StartTask07, NULL, &myTask07_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -225,10 +203,11 @@ void StartTask02(void *argument)
             OLED_ShowNum(56, 2,
                          (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
                          5, 16, 1);
-            char output[64];
-            snprintf(output, sizeof(output), "out:err=%d,speed=%.2f\r\n",
-                     (int)gangzhu_err, (double)gangzhu_speed);
-            App_Uart6Printf("%s", output);
+            if (App_IsPidLogEnabled()) {
+                App_Uart6Printf("err=%d,speed=%d\r\n",
+                                (int)gangzhu_err,
+                                (int)gangzhu_speed);
+            }
     osDelay(100);
   }
   /* USER CODE END StartTask02 */
@@ -276,12 +255,12 @@ void StartTask04(void *argument)
 //   Emm_V5_Pos_Control(5, 0, 50, 10, 40.0f, false, false);
   for(;;)
   {
-     
+      UpperCP_RX();
         if (gangzhu_err_updated != 0U) {
             gangzhu_err_updated = 0U;
            Gangzhu_Control_Update();
         }
-    osDelay(1);
+    osDelay(10);
   }
   /* USER CODE END StartTask04 */
 }
@@ -301,46 +280,10 @@ void StartTask05(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    UpperCP_RX();
+   
     osDelay(20);
   }
   /* USER CODE END StartTask05 */
-}
-
-/* USER CODE BEGIN Header_StartTask06 */
-/**
-* @brief Function implementing the myTask06 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask06 */
-void StartTask06(void *argument)
-{
-  /* USER CODE BEGIN StartTask06 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(100);
-  }
-  /* USER CODE END StartTask06 */
-}
-
-/* USER CODE BEGIN Header_StartTask07 */
-/**
-* @brief Function implementing the myTask07 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask07 */
-void StartTask07(void *argument)
-{
-  /* USER CODE BEGIN StartTask07 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1000);
-  }
-  /* USER CODE END StartTask07 */
 }
 
 /* Private application code --------------------------------------------------*/

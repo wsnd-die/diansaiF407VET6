@@ -22,8 +22,11 @@ extern float output_gangzhu;
 void Gangzhu_Control_Update(void);
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd);
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd);
+void GangzhuPid_SetSpeedGains(GangzhuPid_t *pid, float kp, float ki, float kd);
 void GangzhuPid_AdjustGains(GangzhuPid_t *pid, float kp_delta,
                             float ki_delta, float kd_delta);
+void GangzhuPid_AdjustSpeedGains(GangzhuPid_t *pid, float kp_delta,
+                                  float ki_delta, float kd_delta);
 float GangzhuPid_Update(GangzhuPid_t *pid, short error);
 float GangzhuPid_GetPosition(const GangzhuPid_t *pid);
 

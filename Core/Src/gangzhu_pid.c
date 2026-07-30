@@ -20,7 +20,7 @@ static float GangzhuPid_Clamp(float value, float min_value, float max_value)
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
 {
     const fp32 pid_params[3] = { kp, ki, kd };
-    const fp32 speed_pid_params[3] = { 0.48f, 0.002f, 0.002f };
+    const fp32 speed_pid_params[3] = { 0.49f, 0.00f, 0.0f };
 
     pid->kp = kp;
     pid->ki = ki;
@@ -32,7 +32,7 @@ void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
     pid->target_speed = 0.0f;
     pid->initialized = 0U;
     PID_init(&pid->q_pid, PID_DELTA, pid_params, 140, 10);
-    PID_init(&pid->speed_pid, PID_DELTA, speed_pid_params, 100, 10);
+    PID_init(&pid->speed_pid, PID_DELTA, speed_pid_params, 140, 10);
 }
 
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
@@ -52,15 +52,35 @@ void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
     PID_clear(&pid->speed_pid);
 }
 
+void GangzhuPid_SetSpeedGains(GangzhuPid_t *pid, float kp, float ki, float kd)
+{
+    pid->speed_pid.Kp = (kp > 0.0f) ? kp : 0.0f;
+    pid->speed_pid.Ki = (ki > 0.0f) ? ki : 0.0f;
+    pid->speed_pid.Kd = (kd > 0.0f) ? kd : 0.0f;
+    PID_clear(&pid->speed_pid);
+    pid->output = 0.0f;
+    output_gangzhu = 0.0f;
+    step_mm = 0.0f;
+}
+
 void GangzhuPid_AdjustGains(GangzhuPid_t *pid, float kp_delta,
                             float ki_delta, float kd_delta)
 {
     GangzhuPid_SetGains(pid, pid->kp + kp_delta,
                          pid->ki + ki_delta, pid->kd + kd_delta);
 }
+
+void GangzhuPid_AdjustSpeedGains(GangzhuPid_t *pid, float kp_delta,
+                                  float ki_delta, float kd_delta)
+{
+    GangzhuPid_SetSpeedGains(pid, pid->speed_pid.Kp + kp_delta,
+                              pid->speed_pid.Ki + ki_delta,
+                              pid->speed_pid.Kd + kd_delta);
+}
+
 void Gangzhu_Control_Update(void)
 {
-    if (gangzhu_err == 0) {
+    if ((gangzhu_err == 0) && (gangzhu_speed == 0)) {
         s_gangzhu_pid.target_speed = 0.0f;
         s_gangzhu_pid.output = 0.0f;
         output_gangzhu = 0.0f;
@@ -70,16 +90,22 @@ void Gangzhu_Control_Update(void)
         return;
     }
 
-    s_gangzhu_pid.target_speed = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
+    if (gangzhu_err == 0) {
+        s_gangzhu_pid.target_speed = 0.0f;
+        PID_clear(&s_gangzhu_pid.q_pid);
+    } else {
+        s_gangzhu_pid.target_speed = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
+    }
+
     output_gangzhu = PID_calc(&s_gangzhu_pid.speed_pid,
                               -(float)gangzhu_speed,
                               s_gangzhu_pid.target_speed);
     s_gangzhu_pid.output = output_gangzhu;
-     step_mm=-GangzhuPid_Clamp(output_gangzhu,-100,100);
+     step_mm=-GangzhuPid_Clamp(output_gangzhu,-130,140);
     if (step_mm > 0.0f) {
-        Emm_V5_Pos_Control_ByPulse(5, 0, 150, 220, step_mm, 1, false);
+        Emm_V5_Pos_Control_ByPulse(5, 0, 256, 177, step_mm, 1, false);
     } else if (step_mm < 0.0f) {
-        Emm_V5_Pos_Control_ByPulse(5, 1, 150, 220, -step_mm, 1, false);
+        Emm_V5_Pos_Control_ByPulse(5, 1, 256, 177, -step_mm, 1, false);
     }
 }
  float output_gangzhu;

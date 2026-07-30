@@ -117,7 +117,8 @@ int main(void)
    Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
      HAL_Delay(1000);
     
-   GangzhuPid_Init(&s_gangzhu_pid, 0.0f, 0.0f, 0.0f);
+//   GangzhuPid_Init(&s_gangzhu_pid, 2.4f, 0.02f, 6.4f);
+      GangzhuPid_Init(&s_gangzhu_pid, 0.0f, 0.0f, 0.0f);
   OLED_Init();
   /* USER CODE END 2 */
 

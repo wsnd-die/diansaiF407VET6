@@ -6,82 +6,12 @@
 #include "gangzhu_pid.h"
 #include <stdarg.h>
 #include <stdio.h>
-/* 定义 PI 常量，避免未定义标识符 */
-#ifndef PI
-#define PI 3.14159265358979323846f
-#endif
 
-/* 获取航线数组的元素个数 */
-#define APP_ROUTE_LEN(route) ((uint8_t)(sizeof(route) / sizeof((route)[0])))
-/* 方便定义路径点（X_mm, Y_mm, Yaw_rad, has_action）的辅助宏 */
-#define WAYPOINT(x, y, yaw, act)    {(x), (y), (yaw), (act)}
-#define WAYPOINT_NO_ACT(x, y, yaw)  {(x), (y), (yaw), false}
-#define WAYPOINT_ACT(x, y, yaw)     {(x), (y), (yaw), true}
-
-/* 当前系统的全局应用模式 */
-volatile AppMode_t g_app_mode = APP_MODE_IDLE;
-
-/* 内部状态变量：路径导航是否运行中，是否收到停止请求 */
-static volatile bool s_app_running;
-static volatile bool s_stop_requested;
+/* 串口命令接收标志位 */
 static volatile uint8_t s_data;
 
-/* 航线 A 的目标路径点序列 */
-static const AppWaypoint_t k_route_a[] = {
-    WAYPOINT(0.0f, 700.0f, 0.0f, 1),
-    WAYPOINT(0.0f, 1200.0f, 0.0f, 1),
-    WAYPOINT(0.0f, 1700.0f, 0.0f, 1),
-    WAYPOINT(0.0f, 2200.0f, 0.0f, 1),
-    WAYPOINT(0.0f, 0.0f, 0.0f, 0),
-    WAYPOINT(-1950.0f, 0.0f, 0.0f, false),
-};
-
-/* 航线 C 的目标路径点序列 */
-static const AppWaypoint_t k_route_c[] = {
-    WAYPOINT(-1950.0f, 0.0f, 0.0f, false),
-    WAYPOINT(-1950.0f, 500.0f, 0.0f, false),
-    WAYPOINT(-1950.0f, 1000.0f, 0.0f, false),
-    WAYPOINT(-1950.0f, 1500.0f, 0.0f, false),
-    WAYPOINT(-1950.0f, 2000.0f, 0.0f, false),
-    WAYPOINT(-1950.0f, 2500.0f, 0.0f, false),
-    WAYPOINT(-2700.0f, 2500.0f, -PI, false),
-    WAYPOINT(-2700.0f, 2000.0f, -PI, false),
-    WAYPOINT(-2700.0f, 1500.0f, -PI, false),
-    WAYPOINT(-2700.0f, 1000.0f, -PI, false),
-    WAYPOINT(-2700.0f, 500.0f, -PI, false),
-    WAYPOINT(-2700.0f, 0.0f, -PI, false),
-};
-
-/* 内部静态函数：执行特定的一组航线点，并跳转到指定的下一个模式 */
-static void App_RunRoute(const AppWaypoint_t *route, uint8_t route_len,
-                         AppMode_t next_mode);
-
-/**
- * @brief 初始化应用层状态
- */
-void App_Init(void)
-{
-    g_app_mode = APP_MODE_IDLE;
-    s_app_running = false;
-    s_stop_requested = false;
-    s_data = 0U;
-}
-
-/**
- * @brief 设置目标应用模式
- */
-void App_SetMode(AppMode_t mode)
-{
-    g_app_mode = mode;
-}
-
-/**
- * @brief 查询导航状态
- */
-bool App_IsRunning(void)
-{
-    return s_app_running;
-}
+/* PID 调试步距，默认 0.1 */
+static float s_pid_step = 0.1f;
 
 /**
  * @brief USART6 统一格式化输出，所有蓝牙串口发送都走这一个出口
@@ -127,56 +57,97 @@ void App_ProcessCommand(void)
     s_data = 0U;
 
     if (data == 'a' || data == 'A') {
-//         Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
-//           osDelay(565);
-//      Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 100.0f, 1, false);
-//        osDelay(980);
-//       Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
-//        
-//           osDelay(650);
-//         Emm_V5_Pos_Control_ByPulse(5, 1, 100, 10,1.0f, 1, false);
-        //成功过的版本
-        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
-           osDelay(570);
-      Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 100.0f, 1, false);
-        osDelay(1000);
-       Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 50.0f, 1, false);
-        
-           osDelay(1000);
-         Emm_V5_Pos_Control_ByPulse(5, 0, 100, 20, 1.2f, 1, false);
-        
-//        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 20.0f, 1, false);
-//         osDelay(200);
-//        HAL_Delay(100);
-//         Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 50.0f, 1, false);
+//        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
+//        osDelay(570);
+//        Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 100.0f, 1, false);
+//        osDelay(1000);
+//        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 50.0f, 1, false);
+//        osDelay(1000);
+//        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 20, 1.2f, 1, false);
     } else if (data == 's' || data == 'S') {
-          Emm_V5_Pos_Control_ByPulse(5, 0, 50, 0, 100.0f, 1, false);
+        Emm_V5_Pos_Control_ByPulse(5, 0, 50, 0, 100.0f, 1, false);
     } else if (data == 't' || data == 'T') {
         Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
     } else if (data == 'P') {
-        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.05f, 0.0f, 0.0f);
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, s_pid_step, 0.0f, 0.0f);
         App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
                         s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
     } else if (data == 'p') {
-        GangzhuPid_AdjustGains(&s_gangzhu_pid, -0.05f, 0.0f, 0.0f);
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, -s_pid_step, 0.0f, 0.0f);
         App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
                         s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
     } else if (data == 'I') {
-        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.01f, 0.0f);
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, s_pid_step, 0.0f);
         App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
                         s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
     } else if (data == 'i') {
-        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, -0.01f, 0.0f);
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, -s_pid_step, 0.0f);
         App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
                         s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
     } else if (data == 'D') {
-        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, 0.01f);
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, s_pid_step);
         App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
                         s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
     } else if (data == 'd') {
-        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, -0.01f);
+        GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, -s_pid_step);
         App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
                         s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+    } else if (data == 'Q') {
+        /* 切换 PID 调试步距: 1.0 -> 0.1 -> 0.01 -> 1.0 */
+        if (s_pid_step >= 0.9f) {
+            s_pid_step = 0.1f;
+        } else if (s_pid_step >= 0.09f) {
+            s_pid_step = 0.01f;
+        } else {
+            s_pid_step = 1.0f;
+        }
+        App_Uart6Printf("step=%.2f\r\n", s_pid_step);
+    } else if (data == 'J') {
+        GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, s_pid_step, 0.0f, 0.0f);
+        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+                        s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
+                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+    } else if (data == 'j') {
+        GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, -s_pid_step, 0.0f, 0.0f);
+        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+                        s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
+                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+    } else if (data == 'K') {
+        GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, s_pid_step, 0.0f);
+        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+                        s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
+                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+    } else if (data == 'k') {
+        GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, -s_pid_step, 0.0f);
+        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+                        s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
+                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+    } else if (data == 'L') {
+        GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, 0.0f, s_pid_step);
+        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+                        s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
+                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+    } else if (data == 'l') {
+        GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, 0.0f, -s_pid_step);
+        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+                        s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
+                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
     }
 }
 
+/**
+ * @brief PID 日志开关，调试用
+ * @return true 开启日志输出，false 关闭
+ */
+bool App_IsPidLogEnabled(void)
+{
+    return true;
+}
+
+/**
+ * @brief 初始化应用层调试状态
+ */
+void App_Init(void)
+{
+    s_data = 0U;
+}
