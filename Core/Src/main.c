@@ -110,6 +110,7 @@ int main(void)
   MX_I2C2_Init();
 
   /* USER CODE BEGIN 2 */
+//  Emm_V5_Set_Zero(5,1);
    Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
  
   OLED_Init();
