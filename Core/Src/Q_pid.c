@@ -4,6 +4,7 @@
 */
 #include "Q_pid.h"
 #include <math.h>
+#include <stddef.h>
 
 #define LIMIT_MAX(input, max)   \
     do {                        \
