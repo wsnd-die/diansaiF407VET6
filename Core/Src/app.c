@@ -127,7 +127,28 @@ void App_ProcessCommand(void)
     s_data = 0U;
 
     if (data == 'a' || data == 'A') {
-         Emm_V5_Pos_Control_ByPulse(5, 1, 50, 0, 100.0f, 1, false);
+//         Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
+//           osDelay(565);
+//      Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 100.0f, 1, false);
+//        osDelay(980);
+//       Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
+//        
+//           osDelay(650);
+//         Emm_V5_Pos_Control_ByPulse(5, 1, 100, 10,1.0f, 1, false);
+        //成功过的版本
+        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 100.0f, 1, false);
+           osDelay(570);
+      Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 100.0f, 1, false);
+        osDelay(1000);
+       Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 50.0f, 1, false);
+        
+           osDelay(1000);
+         Emm_V5_Pos_Control_ByPulse(5, 0, 100, 20, 1.2f, 1, false);
+        
+//        Emm_V5_Pos_Control_ByPulse(5, 0, 100, 50, 20.0f, 1, false);
+//         osDelay(200);
+//        HAL_Delay(100);
+//         Emm_V5_Pos_Control_ByPulse(5, 1, 100, 50, 50.0f, 1, false);
     } else if (data == 's' || data == 'S') {
           Emm_V5_Pos_Control_ByPulse(5, 0, 50, 0, 100.0f, 1, false);
     } else if (data == 't' || data == 'T') {

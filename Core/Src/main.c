@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -84,7 +85,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-   HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -99,6 +100,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_UART4_Init();
   MX_UART5_Init();
   MX_USART1_UART_Init();
@@ -109,18 +111,18 @@ int main(void)
   MX_TIM8_Init();
   MX_USART6_UART_Init();
   MX_I2C2_Init();
-
   /* USER CODE BEGIN 2 */
 //  Emm_V5_Set_Zero(5,1);
+    HAL_Delay(1000);
    Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
-   HAL_Delay(1000);
-   GangzhuPid_Init(&s_gangzhu_pid, 0.05f, 0.0f, 5.0f,
+     HAL_Delay(1000);
+    
+   GangzhuPid_Init(&s_gangzhu_pid, 0.05f, 0.0f, 0.0f,
                   GANGZHU_PID_PERIOD_S, GANGZHU_PID_MAX_STEP_MM,
                   GANGZHU_POSITION_MIN_MM, GANGZHU_POSITION_MAX_MM);
   OLED_Init();
   /* USER CODE END 2 */
 
-  
   /* Init scheduler */
   osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
   MX_FREERTOS_Init();

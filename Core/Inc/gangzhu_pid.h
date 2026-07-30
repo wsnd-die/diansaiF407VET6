@@ -21,7 +21,7 @@ typedef struct {
 #define GANGZHU_PID_PERIOD_S       0.01f    // PID控制/采样周期 (0.01秒 = 10毫秒)
 #define GANGZHU_PID_MAX_STEP_MM    8.0f   // 单次控制最大允许步距/输出限制 (单位: mm)
 #define GANGZHU_POSITION_MIN_MM   -100.0f   // 机械软件限位 - 最小下限位置 (单位: mm)
-#define GANGZHU_POSITION_MAX_MM    150.0f   // 机械软件限位 - 最大上限位置 (单位: mm)
+#define GANGZHU_POSITION_MAX_MM    100.0f   // 机械软件限位 - 最大上限位置 (单位: mm)
 extern GangzhuPid_t s_gangzhu_pid;
 extern float step_mm;
 extern float output_gangzhu;

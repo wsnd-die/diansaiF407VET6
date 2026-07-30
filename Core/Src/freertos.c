@@ -110,11 +110,6 @@ const osThreadAttr_t myTask07_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal1,
 };
-/* Definitions for usart2TX */
-osMutexId_t usart2TXHandle;
-const osMutexAttr_t usart2TX_attributes = {
-  .name = "usart2TX"
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -141,9 +136,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
-  /* Create the mutex(es) */
-  /* creation of usart2TX */
-  usart2TXHandle = osMutexNew(&usart2TX_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -193,7 +185,6 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
   * @brief  Function implementing the defaultTask thread.
@@ -239,7 +230,7 @@ void StartTask02(void *argument)
                      (int)gangzhu_err, (double)step_mm,
                      (double)s_gangzhu_pid.position_mm);
             App_Uart6Printf("%s", output);
-    osDelay(300);
+    osDelay(100);
   }
   /* USER CODE END StartTask02 */
 }
@@ -259,6 +250,7 @@ void StartTask03(void *argument)
   for(;;)
   {
      /* g_robot_pos.yaw = Get_zeroYaw(); -- navigation.c removed */
+        
     App_RunCurrentMode();
     App_ProcessCommand();
      vTaskDelay(pdMS_TO_TICKS(100));
@@ -285,12 +277,12 @@ void StartTask04(void *argument)
 //   Emm_V5_Pos_Control(5, 0, 50, 10, 40.0f, false, false);
   for(;;)
   {
-        UpperCP_RX();
+     
         if (gangzhu_err_updated != 0U) {
             gangzhu_err_updated = 0U;
-            Gangzhu_Control_Update();
+           Gangzhu_Control_Update();
         }
-    osDelay(10);
+    osDelay(100);
   }
   /* USER CODE END StartTask04 */
 }
@@ -310,7 +302,8 @@ void StartTask05(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(100);
+    UpperCP_RX();
+    osDelay(20);
   }
   /* USER CODE END StartTask05 */
 }

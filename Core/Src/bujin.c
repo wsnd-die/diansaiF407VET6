@@ -1,36 +1,96 @@
 #include "bujin.h"
 #include "cmsis_os.h"
+#include <string.h>
 
 extern UART_HandleTypeDef huart2;
-extern osMutexId_t usart2TXHandle;
 
 #define BUJIN_PI                  3.1415926f
 #define BUJIN_PULSE_PER_REV       3200.0f
+#define EMM_TX_QUEUE_DEPTH         8U
+#define EMM_TX_FRAME_MAX_LEN       20U
 
 /* 位置模式的毫米换算半径，单位 mm；当前按升降机构旧参数 1.02cm 换成 10.2mm。 */
 #define BUJIN_WHEEL_RADIUS_MM     85.0f
 
+typedef struct
+{
+    uint8_t data[EMM_TX_FRAME_MAX_LEN];
+    uint16_t len;
+} EmmTxFrame_t;
+
+static EmmTxFrame_t s_emm_tx_queue[EMM_TX_QUEUE_DEPTH];
+static uint8_t s_emm_tx_head;
+static uint8_t s_emm_tx_tail;
+static uint8_t s_emm_tx_count;
+static uint8_t s_emm_tx_active;
+
+static void Emm_StartNext(void)
+{
+    HAL_StatusTypeDef status;
+
+    if ((s_emm_tx_active != 0U) || (s_emm_tx_count == 0U))
+    {
+        return;
+    }
+
+    s_emm_tx_active = 1U;
+    status = HAL_UART_Transmit_DMA(&huart2,
+                                   s_emm_tx_queue[s_emm_tx_head].data,
+                                   s_emm_tx_queue[s_emm_tx_head].len);
+    if (status != HAL_OK)
+    {
+        s_emm_tx_active = 0U;
+    }
+}
+
 /* Emm V5 步进驱动器接在 USART2，所有指令最终都从这里发出。 */
 static void Emm_Send(const uint8_t *data, uint16_t len)
 {
-   osStatus_t mutex_status = osOK;
-   uint8_t use_mutex = 0;
+   uint32_t primask;
 
-   if ((usart2TXHandle != NULL) && (osKernelGetState() == osKernelRunning))
+   if ((data == NULL) || (len == 0U) || (len > EMM_TX_FRAME_MAX_LEN))
    {
-       use_mutex = 1;
-       mutex_status = osMutexAcquire(usart2TXHandle, osWaitForever);
+       return;
    }
 
-   if (mutex_status == osOK)
+   primask = __get_PRIMASK();
+   __disable_irq();
+   if (s_emm_tx_count < EMM_TX_QUEUE_DEPTH)
    {
-       (void)HAL_UART_Transmit(&huart2, (uint8_t *)data, len, HAL_MAX_DELAY);
-
-       if (use_mutex != 0)
-       {
-           (void)osMutexRelease(usart2TXHandle);
-       }
+       memcpy(s_emm_tx_queue[s_emm_tx_tail].data, data, len);
+       s_emm_tx_queue[s_emm_tx_tail].len = len;
+       s_emm_tx_tail = (uint8_t)((s_emm_tx_tail + 1U) % EMM_TX_QUEUE_DEPTH);
+       s_emm_tx_count++;
+       Emm_StartNext();
    }
+   if (primask == 0U)
+   {
+       __enable_irq();
+   }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    uint32_t primask;
+
+    if (huart->Instance != USART2)
+    {
+        return;
+    }
+
+    primask = __get_PRIMASK();
+    __disable_irq();
+    if (s_emm_tx_count > 0U)
+    {
+        s_emm_tx_head = (uint8_t)((s_emm_tx_head + 1U) % EMM_TX_QUEUE_DEPTH);
+        s_emm_tx_count--;
+    }
+    s_emm_tx_active = 0U;
+    Emm_StartNext();
+    if (primask == 0U)
+    {
+        __enable_irq();
+    }
 }
 
 static uint32_t Emm_MmToPulse(float mm)

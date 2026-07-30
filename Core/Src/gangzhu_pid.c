@@ -35,7 +35,7 @@ void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd,
     pid->previous_previous_error = 0.0f;
     pid->output = 0.0f;
     pid->initialized = 0U;
-    PID_init(&pid->q_pid, PID_DELTA, pid_params, max_step_mm, max_step_mm);
+    PID_init(&pid->q_pid, PID_DELTA, pid_params, 80, 10);
 }
 
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
@@ -61,14 +61,15 @@ void GangzhuPid_AdjustGains(GangzhuPid_t *pid, float kp_delta,
 }
 void Gangzhu_Control_Update(void)
 {
+    if (gangzhu_err == 0) {
+        return;
+    }
       output_gangzhu  = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
-    int16_t pulut ;
-     pulut = output_gangzhu;
-     step_mm=GangzhuPid_Clamp(pulut,-100,100);
+     step_mm=-GangzhuPid_Clamp(output_gangzhu,-100,100);
     if (step_mm > 0.0f) {
-        Emm_V5_Pos_Control(5, 1, 100, 20, step_mm, 1, false);
+        Emm_V5_Pos_Control(5, 0, 150, 220, step_mm, 1, false);
     } else if (step_mm < 0.0f) {
-        Emm_V5_Pos_Control(5, 0, 100, 20, -step_mm, 1, false);
+        Emm_V5_Pos_Control(5, 1, 150, 220, -step_mm, 1, false);
     }
 }
  float output_gangzhu;
