@@ -580,6 +580,11 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f4xx_hal_timebase_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>fourbar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\fourbar.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
