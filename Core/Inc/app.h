@@ -33,5 +33,7 @@ void App_Uart6Printf(const char *fmt, ...);
  * @return true 开启，false 关闭
  */
 bool App_IsPidLogEnabled(void);
+uint32_t App_GetUart6RxCount(void);
+uint8_t App_GetUart6LastByte(void);
 
 #endif

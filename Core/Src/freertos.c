@@ -29,12 +29,14 @@
 #include "usart.h"
 #include "gpio.h"
 #include "hwt101_hal.h"
-#include "oled.h"
+//#include "oled.h"
+#include "imu660rc.h"
 #include "bujin.h"
 #include "overroll.h"
 #include "app.h"
 #include "UpperCP.h"
 #include "gangzhu_pid.h"
+//#include "i2c.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -72,14 +74,14 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t myTask02Handle;
 const osThreadAttr_t myTask02_attributes = {
   .name = "myTask02",
-  .stack_size = 256 * 4,
+  .stack_size = 768 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal4,
 };
 /* Definitions for myTask03 */
 osThreadId_t myTask03Handle;
 const osThreadAttr_t myTask03_attributes = {
   .name = "myTask03",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal5,
 };
 /* Definitions for myTask04 */
@@ -192,24 +194,22 @@ void StartDefaultTask(void *argument)
 void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
-  /* Infinite loop */
-  OLED_Clear();
-  OLED_ShowString(0, 0, "SYSTEM RUNNING", 16);
-    
+
+  imu660rc_init();
+
   for(;;)
   {
-            OLED_ShowString(0, 2, "G_ERR:", 16);
-            OLED_ShowChar(48, 2, (gangzhu_err < 0) ? '-' : '+', 16);
-            OLED_ShowNum(56, 2,
-                         (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
-                         5, 16, 1);
-            if (App_IsPidLogEnabled()) {
-                App_Uart6Printf("err=%d,speed=%d��pos=%d,spd=%d\r\n", (int)gangzhu_err,
-                                (int)gangzhu_speed,
-                                (int)s_gangzhu_pid.pos_out,
-                                (int)s_gangzhu_pid.spd_out);          
-            }
-    osDelay(100);
+    static uint32_t tick = 0;
+
+    float acc_y = imu660rc_read_acc_y();
+    tick++;
+
+    /* 每 500ms 打印一次 Y 轴加速度 */
+    if (tick % 50 == 0) {
+        App_Uart6Printf("ACC_Y: %.3f g\r\n", acc_y);
+    }
+
+    osDelay(10);  /* 100Hz 读取 */
   }
   /* USER CODE END StartTask02 */
 }
@@ -259,8 +259,8 @@ void StartTask04(void *argument)
       UpperCP_RX();
         if (gangzhu_err_updated != 0U) {
             gangzhu_err_updated = 0U;
-           Gangzhu_Control_Update();
         }
+        Gangzhu_Control_Update();
     osDelay(10);
   }
   /* USER CODE END StartTask04 */

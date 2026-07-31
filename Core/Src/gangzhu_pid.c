@@ -2,21 +2,21 @@
 #include "Q_pid.h"
 #include "UpperCP.h"
 #include "bujin.h"
-#include "fourbar.h"
 #include <stdbool.h>
 
 GangzhuPid_t s_gangzhu_pid;
 volatile float step_mm = 0.0f;
-volatile float output_gangzhu = 0.0f;
 
-/* �е�ͣ���������ٶ�ƽ���˲����� */
-#define POS_DEADBAND        3
-#define SPD_DEADBAND        10.0f
-#define SPD_FILTER_ALPHA    0.8f
+/* 速度死区与平滑滤波参数 */
+#define SPD_DEADBAND        15.0f   /* 速度死区阈值，绝对值小于此值视为 0 */
+#define SPD_FILTER_ALPHA    0.3f    /* 一阶低通滤波系数 (0~1)，越大越平滑 */
 static float s_filtered_speed = 0.0f;
-#define OUTPUT_LPF_ALPHA    0.7f
+
+/* 输出平滑：一阶低通 + slew-rate 限制，允许高加速度不抖 */
+#define OUTPUT_LPF_ALPHA        0.25f  /* 输出低通 (越小响应越快) */
+#define OUTPUT_SLEW_MAX         100.0f  /* 每拍最大变化量，防突变 */
 static float s_filtered_output = 0.0f;
-static bool s_first_filter_run = true;
+static bool  s_output_inited = false;
 
 static float GangzhuPid_Clamp(float value, float min_value, float max_value)
 {
@@ -32,8 +32,8 @@ static float GangzhuPid_Clamp(float value, float min_value, float max_value)
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
 {
     const fp32 pid_params[3] = { kp, ki, kd };
-    const fp32 speed_pid_params[3] = { 0.55f, 0.00f, 0.10f };
-	//const fp32 speed_pid_params[3] = { 0.59f, 0.001f, 0.1f };
+    const fp32 speed_pid_params[3] = { 0.64f, 0.0f, 0.0f };
+//	    const fp32 speed_pid_params[3] = { 0.0f, 0.00f, 0.00f };
 
     pid->kp = kp;
     pid->ki = ki;
@@ -43,12 +43,9 @@ void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
     pid->previous_previous_error = 0.0f;
     pid->output = 0.0f;
     pid->target_speed = 0.0f;
-    pid->speed_enabled = 1;
     pid->initialized = 0U;
     PID_init(&pid->q_pid, PID_POSITION, pid_params, 140, 10);
     PID_init(&pid->speed_pid, PID_POSITION, speed_pid_params, 140, 10);
-
-    FF_Init();
 }
 
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd)
@@ -96,98 +93,82 @@ void GangzhuPid_AdjustSpeedGains(GangzhuPid_t *pid, float kp_delta,
 
 void Gangzhu_Control_Update(void)
 {
-           s_gangzhu_pid.pos_out = 0.0f;
-            s_gangzhu_pid.spd_out = 0.0f;
-
-    /* λ�����ٶ�ͬʱ��������ʱͣ���������������ʷ״̬�� */
-    if ((gangzhu_err >= -POS_DEADBAND) &&
-        (gangzhu_err <= POS_DEADBAND) &&
-        ((float)gangzhu_speed >= -SPD_DEADBAND) &&
-        ((float)gangzhu_speed <= SPD_DEADBAND)) {
+    if ((gangzhu_err == 0) && (gangzhu_speed == 0)) {
+        s_gangzhu_pid.target_speed = 0.0f;
         s_gangzhu_pid.output = 0.0f;
         output_gangzhu = 0.0f;
         step_mm = 0.0f;
         s_filtered_speed = 0.0f;
+        s_filtered_output = 0.0f;
+        s_output_inited = false;
         PID_clear(&s_gangzhu_pid.q_pid);
         PID_clear(&s_gangzhu_pid.speed_pid);
         return;
     }
 
-    /* ========== λ�û���error ?? PID ?? pos_out ========== */
-    if (gangzhu_err != 0) {
-        s_gangzhu_pid.pos_out = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
-    } else {
+    if (gangzhu_err == 0) {
+        s_gangzhu_pid.target_speed = 0.0f;
         PID_clear(&s_gangzhu_pid.q_pid);
-    }
+    } 
+	s_gangzhu_pid.target_speed = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
+//	else if (gangzhu_err>0)
+//	{
+//		 s_gangzhu_pid.target_speed = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
+//	}
+//	else {
+//         s_gangzhu_pid.target_speed = -GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
+//    }
 
-    /* ========== �ٶȷ�������?? + ��ͨ��?? ========== */
     {
         float raw_speed = (float)gangzhu_speed;
 
+        /* 死区处理：绝对值小于阈值则视为 0 */
         if (raw_speed < SPD_DEADBAND && raw_speed > -SPD_DEADBAND) {
             raw_speed = 0.0f;
         }
 
+        /* 一阶低通滤波：s_filtered = α·s_filtered + (1-α)·raw */
         s_filtered_speed = SPD_FILTER_ALPHA * s_filtered_speed
                          + (1.0f - SPD_FILTER_ALPHA) * raw_speed;
     }
 
-    /* ========== �ٶȻ������� PID����ʹ��ʱ�����?? ========== */
-    if (s_gangzhu_pid.speed_enabled) {
-        s_gangzhu_pid.spd_out = PID_calc(&s_gangzhu_pid.speed_pid,
-                           -s_filtered_speed,
-                           s_gangzhu_pid.target_speed);
-    } else {
-        PID_clear(&s_gangzhu_pid.speed_pid);
-    }
-
-    /* ========== ������� ========== */
-    output_gangzhu = s_gangzhu_pid.pos_out + s_gangzhu_pid.spd_out;
-    {
-        float compensated = FF_Compensate(output_gangzhu,
-                                           s_gangzhu_pid.target_speed,
-                                           gangzhu_err);
-        output_gangzhu = compensated;
-    }
+    output_gangzhu = PID_calc(&s_gangzhu_pid.speed_pid,
+                              -s_filtered_speed,
+                              s_gangzhu_pid.target_speed);
     s_gangzhu_pid.output = output_gangzhu;
-    step_mm = GangzhuPid_Clamp(output_gangzhu, -130.0f, 130.0f);
+    step_mm = -GangzhuPid_Clamp(output_gangzhu, -130.0f, 140.0f);
 
-//    if (step_mm > 0.0f) {
-//        Emm_V5_Pos_Control_ByPulse(5, 1, 500, 240,
-//                                   (uint32_t)step_mm, 1, false);
-//    } else if (step_mm < 0.0f) {
-//        Emm_V5_Pos_Control_ByPulse(5, 0, 500, 240,
-//                                   (uint32_t)(-step_mm), 1, false);
-//    }
-    if (s_first_filter_run) {
-        s_filtered_output = step_mm;
-        s_first_filter_run = false;
-    } else {
-        s_filtered_output = OUTPUT_LPF_ALPHA * s_filtered_output + (1.0f - OUTPUT_LPF_ALPHA) * step_mm;
-    }
+    /* ==== 输出一阶低通 + slew-rate 限制 ==== */
+    {
+        float raw = step_mm;
+        float filtered;
 
-    // 取整并驱动
-    uint32_t pulse_abs;
-    uint8_t dir;
-    if (s_filtered_output > 0.0f) {
-        dir = 1;
-        pulse_abs = (uint32_t)(s_filtered_output + 0.5f);
-    } else if (s_filtered_output < 0.0f) {
-        dir = 0;
-        pulse_abs = (uint32_t)(-s_filtered_output + 0.5f);
-    } else {
-        dir = 1;
-        pulse_abs = 0;
-    }
+        /* 首次调用直接用当前值 */
+        if (!s_output_inited) {
+            s_filtered_output = raw;
+            s_output_inited = true;
+        } else {
+            /* 一阶低通 */
+            filtered = OUTPUT_LPF_ALPHA * s_filtered_output
+                     + (1.0f - OUTPUT_LPF_ALPHA) * raw;
+            /* slew-rate 限制 */
+            float delta = filtered - s_filtered_output;
+            if (delta > OUTPUT_SLEW_MAX) {
+                filtered = s_filtered_output + OUTPUT_SLEW_MAX;
+            } else if (delta < -OUTPUT_SLEW_MAX) {
+                filtered = s_filtered_output - OUTPUT_SLEW_MAX;
+            }
+            s_filtered_output = filtered;
+        }
 
-    if (pulse_abs > 0) {
-        Emm_V5_Pos_Control_ByPulse(5, dir, 700, 240, pulse_abs, 1, false);
-    } else {
-        // 可选：停止电机
-        // Emm_V5_Pos_Control_ByPulse(5, dir, 500, 250, 0, 1, false);
+        if (s_filtered_output > 0.0f) {
+            Emm_V5_Pos_Control_ByPulse(5, 0, 800, 240, (uint32_t)(s_filtered_output + 0.5f), 1, false);
+        } else if (s_filtered_output < 0.0f) {
+            Emm_V5_Pos_Control_ByPulse(5, 1, 800, 240, (uint32_t)(-s_filtered_output + 0.5f), 1, false);
+        }
     }
 }
-
+ volatile float output_gangzhu;
 float GangzhuPid_Update(GangzhuPid_t *pid, short error)
 {
     float error_f = (float)error;
@@ -210,38 +191,24 @@ float GangzhuPid_GetPosition(const GangzhuPid_t *pid)
 
 void GangzhuPid_ResetState(GangzhuPid_t *pid)
 {
-    if (pid == NULL) {
-        return;
-    }
-    pid->previous_error = 0.0f;
-    pid->previous_previous_error = 0.0f;
+    if (pid == NULL) return;
     pid->output = 0.0f;
     pid->target_speed = 0.0f;
-    pid->initialized = 0U;
-    s_filtered_speed = 0.0f;
     output_gangzhu = 0.0f;
     step_mm = 0.0f;
+    s_filtered_speed = 0.0f;
+    s_filtered_output = 0.0f;
+    s_output_inited = false;
     PID_clear(&pid->q_pid);
     PID_clear(&pid->speed_pid);
-    
-	s_filtered_output = 0.0f;
-	s_first_filter_run = true; 	
-    FF_Reset();
 }
 
 void GangzhuPid_SetOuterEnabled(GangzhuPid_t *pid, bool enabled)
 {
-    if (pid == NULL) {
-        return;
-    }
-    pid->speed_enabled = enabled;
+    if (pid == NULL) return;
+    pid->outer_enabled = enabled;
     if (!enabled) {
         pid->target_speed = 0.0f;
         PID_clear(&pid->q_pid);
     }
-}
-
-float GangzhuPid_GetFilteredSpeed(void)
-{
-    return s_filtered_speed;
 }

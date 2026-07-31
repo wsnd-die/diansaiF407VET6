@@ -31,7 +31,8 @@
 #include "usart.h"
 #include "gpio.h"
 #include "hwt101_hal.h"
-#include "oled.h"
+//#include "oled.h"
+#include "imu660rc.h"
 #include "bujin.h"
 #include "overroll.h"
 #include "gangzhu_pid.h"
@@ -118,11 +119,12 @@ int main(void)
      HAL_Delay(1000);
     
 //   GangzhuPid_Init(&s_gangzhu_pid, 0.5f, 0.02f, 1.1f);
- GangzhuPid_Init(&s_gangzhu_pid,0.12f, 0.003f, 0.02f);
-//GangzhuPid_Init(&s_gangzhu_pid, 0.44f, 0.04f, 0.05f);
+// GangzhuPid_Init(&s_gangzhu_pid,0.08f, 0.003f, 0.02f);
+GangzhuPid_Init(&s_gangzhu_pid, 0.34f, 0.0f, 0.0f);
 //      GangzhuPid_Init(&s_gangzhu_pid, 0.44f, 0.04f, 0.05f);
-//GangzhuPid_Init(&s_gangzhu_pid, 0.0f, 0.0f, 0.0f);
-  OLED_Init();
+// GangzhuPid_Init(&s_gangzhu_pid, 0.0f, 0.0f, 0.01f);
+//  OLED_Init();
+//  ICM42686_Init(NULL);  /* 移到 Task02 中执行，避免阻塞 main */
   /* USER CODE END 2 */
 
   /* Init scheduler */
