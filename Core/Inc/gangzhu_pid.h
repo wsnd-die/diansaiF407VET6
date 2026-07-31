@@ -16,11 +16,13 @@ typedef struct {
     float output;            /* 上次 PID 输出 */
     float target_speed;      /* 速度环目标速度 */
     bool speed_enabled;      /* 速度环使能标志 */
+    float pos_out;
+    float spd_out;
     unsigned char initialized;
 } GangzhuPid_t;
 extern GangzhuPid_t s_gangzhu_pid;
-extern float step_mm;
-extern float output_gangzhu;
+extern volatile float step_mm;
+extern volatile float output_gangzhu;
 void Gangzhu_Control_Update(void);
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd);
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd);
