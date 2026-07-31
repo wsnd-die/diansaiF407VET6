@@ -1,6 +1,7 @@
 #include "UpperCP.h"
 #include "usart.h"
 #include "oled.h"
+#include "cmsis_os.h"
 
 #include <stdarg.h>
 #include <limits.h>
@@ -40,7 +41,11 @@ static void Serial5_Printf(const char *fmt, ...)
         len = (int)sizeof(tx_buf) - 1;
     }
 
-    (void)HAL_UART_Transmit(&huart5, (uint8_t *)tx_buf, (uint16_t)len, 100U);
+    /* 等待上一次 DMA 发送完成 */
+    while (huart5.gState == HAL_UART_STATE_BUSY_TX) {
+        osDelay(1);
+    }
+    (void)HAL_UART_Transmit_DMA(&huart5, (uint8_t *)tx_buf, (uint16_t)len);
 }
 
 void UpperCP_UartRxByte(uint8_t data)
