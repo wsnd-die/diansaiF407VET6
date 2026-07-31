@@ -7,9 +7,9 @@
 GangzhuPid_t s_gangzhu_pid;
 float step_mm = 0.0f;
 
-/* 速度死区与平滑滤波参数 */
-#define SPD_DEADBAND        15.0f   /* 速度死区阈值，绝对值小于此值视为 0 */
-#define SPD_FILTER_ALPHA    0.8f    /* 一阶低通滤波系数 (0~1)，越大越平滑 */
+/* 速度死区与平滑滤波参�? */
+#define SPD_DEADBAND        15.0f   /* 速度死区阈值，绝对值小于此值视�? 0 */
+#define SPD_FILTER_ALPHA    0.8f    /* 一阶低通滤波系�? (0~1)，越大越平滑 */
 static float s_filtered_speed = 0.0f;
 
 static float GangzhuPid_Clamp(float value, float min_value, float max_value)
@@ -36,7 +36,7 @@ void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd)
     pid->previous_previous_error = 0.0f;
     pid->output = 0.0f;
     pid->target_speed = 0.0f;
-    pid->speed_enabled = false;
+    pid->speed_enabled = 1;
     pid->initialized = 0U;
     PID_init(&pid->q_pid, PID_DELTA, pid_params, 140, 10);
     PID_init(&pid->speed_pid, PID_DELTA, speed_pid_params, 140, 10);
@@ -87,8 +87,8 @@ void GangzhuPid_AdjustSpeedGains(GangzhuPid_t *pid, float kp_delta,
 
 void Gangzhu_Control_Update(void)
 {
-    float pos_out = 0.0f;
-    float spd_out = 0.0f;
+           s_gangzhu_pid.pos_out = 0.0f;
+            s_gangzhu_pid.spd_out = 0.0f;
 
     /* 两路输入都为零时完全复位 */
     if ((gangzhu_err == 0) && (gangzhu_speed == 0)) {
@@ -101,14 +101,14 @@ void Gangzhu_Control_Update(void)
         return;
     }
 
-    /* ========== 位置环：error → PID → pos_out ========== */
+    /* ========== 位置环：error �? PID �? pos_out ========== */
     if (gangzhu_err != 0) {
-        pos_out = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
+        s_gangzhu_pid.pos_out = GangzhuPid_Update(&s_gangzhu_pid, gangzhu_err);
     } else {
         PID_clear(&s_gangzhu_pid.q_pid);
     }
 
-    /* ========== 速度反馈：死区 + 低通滤波 ========== */
+    /* ========== 速度反馈：死�? + 低通滤�? ========== */
     {
         float raw_speed = (float)gangzhu_speed;
 
@@ -120,9 +120,9 @@ void Gangzhu_Control_Update(void)
                          + (1.0f - SPD_FILTER_ALPHA) * raw_speed;
     }
 
-    /* ========== 速度环：独立 PID，仅使能时参与叠加 ========== */
+    /* ========== 速度环：独立 PID，仅使能时参与叠�? ========== */
     if (s_gangzhu_pid.speed_enabled) {
-        spd_out = PID_calc(&s_gangzhu_pid.speed_pid,
+        s_gangzhu_pid.spd_out = PID_calc(&s_gangzhu_pid.speed_pid,
                            -s_filtered_speed,
                            s_gangzhu_pid.target_speed);
     } else {
@@ -130,9 +130,9 @@ void Gangzhu_Control_Update(void)
     }
 
     /* ========== 叠加输出 ========== */
-    output_gangzhu = pos_out + spd_out;
+    output_gangzhu = s_gangzhu_pid.pos_out + s_gangzhu_pid.spd_out;
     s_gangzhu_pid.output = output_gangzhu;
-    step_mm = -GangzhuPid_Clamp(output_gangzhu, -130, 140);
+    step_mm = GangzhuPid_Clamp(output_gangzhu, -130, 140);
 
     if (step_mm > 0.0f) {
         Emm_V5_Pos_Control_ByPulse(5, 0, 256, 177, step_mm, 1, false);
