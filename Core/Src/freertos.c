@@ -204,9 +204,10 @@ void StartTask02(void *argument)
                          (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
                          5, 16, 1);
             if (App_IsPidLogEnabled()) {
-                App_Uart6Printf("pos=%d,spd=%d\r\n",
+                App_Uart6Printf("err=%d,speed=%d£¬pos=%d,spd=%d\r\n", (int)gangzhu_err,
+                                (int)gangzhu_speed,
                                 (int)s_gangzhu_pid.pos_out,
-                                (int)s_gangzhu_pid.spd_out);
+                                (int)s_gangzhu_pid.spd_out);          
             }
     osDelay(100);
   }

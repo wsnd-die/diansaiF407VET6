@@ -21,8 +21,8 @@ typedef struct {
     unsigned char initialized;
 } GangzhuPid_t;
 extern GangzhuPid_t s_gangzhu_pid;
-extern float step_mm;
-extern float output_gangzhu;
+extern volatile float step_mm;
+extern volatile float output_gangzhu;
 void Gangzhu_Control_Update(void);
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd);
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd);

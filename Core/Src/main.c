@@ -118,7 +118,7 @@ int main(void)
      HAL_Delay(1000);
     
 //   GangzhuPid_Init(&s_gangzhu_pid, 0.5f, 0.02f, 1.1f);
-      GangzhuPid_Init(&s_gangzhu_pid, 0.42f, 0.0f, 2.11f);
+      GangzhuPid_Init(&s_gangzhu_pid, 0.08f, 0.0f, 0.01f);
   OLED_Init();
   /* USER CODE END 2 */
 
