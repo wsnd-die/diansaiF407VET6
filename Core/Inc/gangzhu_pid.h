@@ -2,6 +2,7 @@
 #define GANGZHU_PID_H
 
 #include "Q_pid.h"
+#include <stdbool.h>
 
 typedef struct {
     pid_type_def q_pid;      /* 距离外环 PID 控制器 */
@@ -13,7 +14,8 @@ typedef struct {
     float previous_error;    /* 上次误差 */
     float previous_previous_error; /* 上上次误差 */
     float output;            /* 上次 PID 输出 */
-    float target_speed;      /* 距离外环给出的目标速度 */
+    float target_speed;      /* 速度环目标速度 */
+    bool speed_enabled;      /* 速度环使能标志 */
     unsigned char initialized;
 } GangzhuPid_t;
 extern GangzhuPid_t s_gangzhu_pid;

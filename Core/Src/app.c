@@ -156,6 +156,21 @@ void App_ProcessCommand(void)
                         s_gangzhu_pid.speed_pid.Kd,
                         s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
                         s_gangzhu_pid.speed_pid.Dout);
+    } else if (data == 'z') {
+        s_gangzhu_pid.speed_enabled = !s_gangzhu_pid.speed_enabled;
+        App_Uart6Printf("spd_en=%d target=%.2f\r\n",
+                        s_gangzhu_pid.speed_enabled,
+                        s_gangzhu_pid.target_speed);
+    } else if (data == 'W') {
+        s_gangzhu_pid.target_speed += s_pid_step;
+        App_Uart6Printf("spd_en=%d target=%.2f\r\n",
+                        s_gangzhu_pid.speed_enabled,
+                        s_gangzhu_pid.target_speed);
+    } else if (data == 'w') {
+        s_gangzhu_pid.target_speed -= s_pid_step;
+        App_Uart6Printf("spd_en=%d target=%.2f\r\n",
+                        s_gangzhu_pid.speed_enabled,
+                        s_gangzhu_pid.target_speed);
     }
 }
 

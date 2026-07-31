@@ -203,11 +203,11 @@ void StartTask02(void *argument)
             OLED_ShowNum(56, 2,
                          (uint32_t)((gangzhu_err < 0) ? -gangzhu_err : gangzhu_err),
                          5, 16, 1);
-//            if (App_IsPidLogEnabled()) {
-//                App_Uart6Printf("err=%d,speed=%d\r\n",
-//                                (int)gangzhu_err,
-//                                (int)gangzhu_speed);
-//            }
+            if (App_IsPidLogEnabled()) {
+                App_Uart6Printf("err=%d,speed=%d\r\n",
+                                (int)gangzhu_err,
+                                (int)gangzhu_speed);
+            }
     osDelay(100);
   }
   /* USER CODE END StartTask02 */
