@@ -70,28 +70,40 @@ void App_ProcessCommand(void)
         Emm_V5_Trigger_Zero(5, EMM_V5_ZERO_SINGLE_NEAREST, false);
     } else if (data == 'P') {
         GangzhuPid_AdjustGains(&s_gangzhu_pid, s_pid_step, 0.0f, 0.0f);
-        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
-                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+        App_Uart6Printf("pos KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd,
+                        s_gangzhu_pid.q_pid.Pout, s_gangzhu_pid.q_pid.Iout,
+                        s_gangzhu_pid.q_pid.Dout);
     } else if (data == 'p') {
         GangzhuPid_AdjustGains(&s_gangzhu_pid, -s_pid_step, 0.0f, 0.0f);
-        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
-                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+        App_Uart6Printf("pos KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd,
+                        s_gangzhu_pid.q_pid.Pout, s_gangzhu_pid.q_pid.Iout,
+                        s_gangzhu_pid.q_pid.Dout);
     } else if (data == 'I') {
         GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, s_pid_step, 0.0f);
-        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
-                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+        App_Uart6Printf("pos KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd,
+                        s_gangzhu_pid.q_pid.Pout, s_gangzhu_pid.q_pid.Iout,
+                        s_gangzhu_pid.q_pid.Dout);
     } else if (data == 'i') {
         GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, -s_pid_step, 0.0f);
-        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
-                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+        App_Uart6Printf("pos KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd,
+                        s_gangzhu_pid.q_pid.Pout, s_gangzhu_pid.q_pid.Iout,
+                        s_gangzhu_pid.q_pid.Dout);
     } else if (data == 'D') {
         GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, s_pid_step);
-        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
-                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+        App_Uart6Printf("pos KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd,
+                        s_gangzhu_pid.q_pid.Pout, s_gangzhu_pid.q_pid.Iout,
+                        s_gangzhu_pid.q_pid.Dout);
     } else if (data == 'd') {
         GangzhuPid_AdjustGains(&s_gangzhu_pid, 0.0f, 0.0f, -s_pid_step);
-        App_Uart6Printf("out: KP=%.2f,KI=%.2f,KD=%.2f\r\n",
-                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd);
+        App_Uart6Printf("pos KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
+                        s_gangzhu_pid.kp, s_gangzhu_pid.ki, s_gangzhu_pid.kd,
+                        s_gangzhu_pid.q_pid.Pout, s_gangzhu_pid.q_pid.Iout,
+                        s_gangzhu_pid.q_pid.Dout);
     } else if (data == 'Q') {
         /* 切换 PID 调试步距: 1.0 -> 0.1 -> 0.01 -> 1.0 */
         if (s_pid_step >= 0.9f) {
@@ -104,34 +116,46 @@ void App_ProcessCommand(void)
         App_Uart6Printf("step=%.2f\r\n", s_pid_step);
     } else if (data == 'J') {
         GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, s_pid_step, 0.0f, 0.0f);
-        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+        App_Uart6Printf("spd KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
                         s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
-                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+                        s_gangzhu_pid.speed_pid.Kd,
+                        s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
+                        s_gangzhu_pid.speed_pid.Dout);
     } else if (data == 'j') {
         GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, -s_pid_step, 0.0f, 0.0f);
-        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+        App_Uart6Printf("spd KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
                         s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
-                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+                        s_gangzhu_pid.speed_pid.Kd,
+                        s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
+                        s_gangzhu_pid.speed_pid.Dout);
     } else if (data == 'K') {
         GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, s_pid_step, 0.0f);
-        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+        App_Uart6Printf("spd KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
                         s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
-                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+                        s_gangzhu_pid.speed_pid.Kd,
+                        s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
+                        s_gangzhu_pid.speed_pid.Dout);
     } else if (data == 'k') {
         GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, -s_pid_step, 0.0f);
-        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+        App_Uart6Printf("spd KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
                         s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
-                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+                        s_gangzhu_pid.speed_pid.Kd,
+                        s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
+                        s_gangzhu_pid.speed_pid.Dout);
     } else if (data == 'L') {
         GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, 0.0f, s_pid_step);
-        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+        App_Uart6Printf("spd KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
                         s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
-                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+                        s_gangzhu_pid.speed_pid.Kd,
+                        s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
+                        s_gangzhu_pid.speed_pid.Dout);
     } else if (data == 'l') {
         GangzhuPid_AdjustSpeedGains(&s_gangzhu_pid, 0.0f, 0.0f, -s_pid_step);
-        App_Uart6Printf("spd: KP=%.2f,KI=%.2f,KD=%.2f,step=%.2f\r\n",
+        App_Uart6Printf("spd KP=%.2f KI=%.2f KD=%.2f P=%.3f I=%.3f D=%.3f\r\n",
                         s_gangzhu_pid.speed_pid.Kp, s_gangzhu_pid.speed_pid.Ki,
-                        s_gangzhu_pid.speed_pid.Kd, s_pid_step);
+                        s_gangzhu_pid.speed_pid.Kd,
+                        s_gangzhu_pid.speed_pid.Pout, s_gangzhu_pid.speed_pid.Iout,
+                        s_gangzhu_pid.speed_pid.Dout);
     }
 }
 

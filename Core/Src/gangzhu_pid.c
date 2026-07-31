@@ -119,7 +119,7 @@ void Gangzhu_Control_Update(void)
 
     output_gangzhu = PID_calc(&s_gangzhu_pid.speed_pid,
                               -s_filtered_speed,
-                              s_gangzhu_pid.target_speed);
+                              -s_gangzhu_pid.target_speed);
     s_gangzhu_pid.output = output_gangzhu;
      step_mm=-GangzhuPid_Clamp(output_gangzhu,-130,140);
     if (step_mm > 0.0f) {
