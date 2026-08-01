@@ -196,17 +196,19 @@ void StartTask02(void *argument)
   /* USER CODE BEGIN StartTask02 */
 
   imu660rc_init();
+  imu660rc_calibrate();
 
   for(;;)
   {
     static uint32_t tick = 0;
 
-    float acc_y = imu660rc_read_acc_y();
+    float acc_y = imu660rc_get_acc_y_filtered();
+    GangzhuPid_SetAccFeedforward(acc_y);  /* 外部传入前馈值 (仿 PC set_car_acceleration_feedforward) */
     tick++;
 
-    /* 每 500ms 打印一次 Y 轴加速度 */
-    if (tick % 50 == 0) {
-        App_Uart6Printf("ACC_Y: %.3f g\r\n", acc_y);
+    /* 每 50ms 打印一次 */
+    if (tick % 5 == 0) {
+        App_Uart6Printf("ACC_Y: %.3f ,%.1f\r\n", acc_y, (double)acc_cmp);
     }
 
     osDelay(10);  /* 100Hz 读取 */
@@ -232,7 +234,7 @@ void StartTask03(void *argument)
         
 
     App_ProcessCommand();
-     vTaskDelay(pdMS_TO_TICKS(100));
+     vTaskDelay(pdMS_TO_TICKS(20));
   }
   /* USER CODE END StartTask03 */
 }

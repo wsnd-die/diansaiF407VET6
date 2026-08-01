@@ -19,11 +19,19 @@ typedef struct {
     bool outer_enabled;
     float pos_out;
     float spd_out;
+    /* ---- 加速度前馈 (外部传入, 仿 PC feedforward) ---- */
+    float car_acc_feedforward_mm;  /* 当前前馈值 (mm), 由外部 setter 写入 */
+    float car_acc_gain;            /* 前馈增益 (mm/g), 0=禁用 */
+    float car_acc_max;             /* 前馈限幅 (mm) */
+    bool  car_acc_fresh;           /* 数据是否新鲜 */
+    /* ---- */
     unsigned char initialized;
 } GangzhuPid_t;
 extern GangzhuPid_t s_gangzhu_pid;
 extern volatile float step_mm;
 extern volatile float output_gangzhu;
+extern volatile float acc_cmp;
+
 void Gangzhu_Control_Update(void);
 void GangzhuPid_Init(GangzhuPid_t *pid, float kp, float ki, float kd);
 void GangzhuPid_SetGains(GangzhuPid_t *pid, float kp, float ki, float kd);
@@ -34,6 +42,13 @@ void GangzhuPid_AdjustSpeedGains(GangzhuPid_t *pid, float kp_delta,
                                   float ki_delta, float kd_delta);
 void GangzhuPid_ResetState(GangzhuPid_t *pid);
 void GangzhuPid_SetOuterEnabled(GangzhuPid_t *pid, bool enabled);
+
+/* 加速度前馈 (外部调用, 仿 PC set_car_acceleration_feedforward) */
+void GangzhuPid_SetAccFeedforward(float acc_y_g);
+float GangzhuPid_GetAccFeedforward(void);
+void GangzhuPid_SetAccGain(float gain);
+float GangzhuPid_GetAccGain(void);
+
 float GangzhuPid_GetFilteredSpeed(void);
 float GangzhuPid_Update(GangzhuPid_t *pid, short error);
 float GangzhuPid_GetPosition(const GangzhuPid_t *pid);

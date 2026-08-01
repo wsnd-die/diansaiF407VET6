@@ -203,6 +203,10 @@ bool imu660rc_init(void)
     return true;
 }
 
+static float g_acc_offset  = 0.0f;    /* 零偏校准值 */
+static float g_acc_filtered = 0.0f;    /* 低通滤波后的值 */
+static bool  g_calibrated   = false;
+
 /* ========== 读 Y 轴加速度 ========== */
 
 float imu660rc_read_acc_y(void)
@@ -215,4 +219,47 @@ float imu660rc_read_acc_y(void)
     raw = (int16_t)(((uint16_t)hi << 8) | lo);
 
     return (float)raw / IMU660RC_ACC_SENS_2G;
+}
+
+/* ========== 滤波后的 Y 轴加速度 ========== */
+
+float imu660rc_get_acc_y_filtered(void)
+{
+    float raw = imu660rc_read_acc_y() - g_acc_offset;
+
+    /* 死区：微小抖动归零，避免噪声被后续增益放大 */
+    if (raw < IMU660RC_DEADBAND && raw > -IMU660RC_DEADBAND) {
+        raw = 0.0f;
+    }
+
+    /* 一阶低通: filtered = alpha * filtered + (1-alpha) * raw */
+    g_acc_filtered = IMU660RC_FILTER_ALPHA * g_acc_filtered
+                   + (1.0f - IMU660RC_FILTER_ALPHA) * raw;
+
+    return g_acc_filtered;
+}
+
+/* ========== 零偏校准 ========== */
+
+void imu660rc_calibrate(void)
+{
+    float sum = 0.0f;
+
+    App_Uart6Printf("[IMU660RC] calibrating (%d samples)...\r\n", IMU660RC_CALIB_SAMPLES);
+
+    for (int i = 0; i < IMU660RC_CALIB_SAMPLES; i++) {
+        sum += imu660rc_read_acc_y();
+        HAL_Delay(5);  /* 5ms 间隔, 合计约 1s */
+    }
+
+    g_acc_offset = sum / (float)IMU660RC_CALIB_SAMPLES;
+    g_calibrated = true;
+    g_acc_filtered = 0.0f;
+
+    App_Uart6Printf("[IMU660RC] calib done, offset=%.4f g\r\n", g_acc_offset);
+}
+
+bool imu660rc_is_calibrated(void)
+{
+    return g_calibrated;
 }

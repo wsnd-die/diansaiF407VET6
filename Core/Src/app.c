@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "bujin.h"
 #include "gangzhu_pid.h"
+#include "imu660rc.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -37,7 +38,18 @@ void App_Uart6Printf(const char *fmt, ...)
         tx_len = (int)sizeof(tx_buf) - 1;
     }
 
-    (void)HAL_UART_Transmit(&huart6, (uint8_t *)tx_buf, (uint16_t)tx_len, 100U);
+    /* 简单自旋锁: 避免多任务同时抢 UART TX */
+    {
+        static volatile bool s_tx_busy = false;
+        int retry = 0;
+        while (s_tx_busy && retry < 50) {
+            osDelay(1);  /* 等 1ms */
+            retry++;
+        }
+        s_tx_busy = true;
+        (void)HAL_UART_Transmit(&huart6, (uint8_t *)tx_buf, (uint16_t)tx_len, 200U);
+        s_tx_busy = false;
+    }
 }
 
 void App_CommandUartRxByte(uint8_t data)
@@ -136,10 +148,21 @@ static void App_ProcessLineCommand(const char *line)
     } else if (strcmp(line, "@zero") == 0) {
         GangzhuPid_ResetState(&s_gangzhu_pid);
         App_Uart6Printf("pidack,zero\r\n");
+    } else if (strcmp(line, "@acc?") == 0) {
+        App_Uart6Printf("pidack,acc,gain=%.2f,ff_mm=%.1f,calib=%d\r\n",
+                        GangzhuPid_GetAccGain(),
+                        GangzhuPid_GetAccFeedforward(),
+                        imu660rc_is_calibrated() ? 1 : 0);
+    } else if (sscanf(line, "@acc %f", &value) == 1) {
+        GangzhuPid_SetAccGain(value);
+        App_Uart6Printf("pidack,acc,gain=%.2f\r\n", GangzhuPid_GetAccGain());
+    } else if (strcmp(line, "@acc_cal") == 0) {
+        imu660rc_calibrate();
+        App_Uart6Printf("pidack,acc_cal,done\r\n");
     } else if (strncmp(line, "@mark ", 6U) == 0) {
         App_Uart6Printf("pidmark,%s\r\n", &line[6]);
     } else if (strcmp(line, "@help") == 0) {
-        App_Uart6Printf("pidack,help,@pid @pid? @vpid @vpid? @vtarget @outer @speed @log @zero @mark\r\n");
+        App_Uart6Printf("pidack,help,@pid @pid? @vpid @vpid? @vtarget @outer @speed @log @zero @acc @acc? @acc_cal @mark\r\n");
     } else {
         App_Uart6Printf("piderr,unknown,%s\r\n", line);
     }

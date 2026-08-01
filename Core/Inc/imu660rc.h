@@ -30,9 +30,19 @@
 
 #define IMU660RC_OUTY_L_A       0x2AU
 #define IMU660RC_OUTY_H_A       0x2BU
+#define IMU660RC_OUTX_L_A           ( 0x28 )
+#define IMU660RC_OUTX_H_A           ( 0x29 )
+
+/* ========== 滤波参数 ========== */
+#define IMU660RC_FILTER_ALPHA    0.06f  /* 低通: 快速跟踪方向反转 (~3ms) */
+#define IMU660RC_DEADBAND        0.003f  /* 死区阈值 (g) */
+#define IMU660RC_CALIB_SAMPLES   300     /* 零偏校准采样数 */
 
 /* ========== API ========== */
 bool imu660rc_init(void);
 float imu660rc_read_acc_y(void);
+float imu660rc_get_acc_y_filtered(void);  /* 滤波+零偏校准后的 Y 轴加速度 (g) */
+void imu660rc_calibrate(void);             /* 零偏校准 (静止状态下调用) */
+bool imu660rc_is_calibrated(void);
 
 #endif
